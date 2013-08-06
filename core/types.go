@@ -17,6 +17,7 @@ type Param interface {
 }
 
 type Paramer interface {
+	Name() string
 	NumParams() ParamIdx
 	Param(ParamIdx) Param
 }

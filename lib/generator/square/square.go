@@ -22,6 +22,10 @@ func MakeGenerator(sampleRate core.Quantity) core.Generator {
 	return s
 }
 
+func (s *State) Name() string {
+	return "Sq Osc"
+}
+
 func (s *State) NumParams() core.ParamIdx {
 	return 1
 }

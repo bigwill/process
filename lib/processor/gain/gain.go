@@ -13,6 +13,10 @@ func MakeProcessor(sample_rate core.Quantity) core.Processor {
 	return &State{g: linear.MakeState("Gain", "dB", 0, 1, .8)}
 }
 
+func (s *State) Name() string {
+	return "Gain"
+}
+
 func (s *State) NumParams() core.ParamIdx {
 	return 1
 }

@@ -16,8 +16,8 @@ func main() {
 	filter.Param(0).SetPos(.2)
 	square.Param(0).SetPos(.6)
 
-	log.Printf("Osc freq %s", square.Param(0).Repr())
-	log.Printf("Cutoff %s", filter.Param(0).Repr())
+	log.Printf("%s %s", square.Name(), square.Param(0).Repr())
+	log.Printf("%s %s", filter.Name(), filter.Param(0).Repr())
 
 	for i := 0; i < 4800; i++ {
 		fmt.Printf("%v\t%v\n", i, gain.Process(filter.Process(square.Generate())))

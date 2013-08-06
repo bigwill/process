@@ -27,6 +27,10 @@ func MakeProcessor(sampleRate core.Quantity) core.Processor {
 	return s
 }
 
+func (s *State) Name() string {
+	return "RC Fil"
+}
+
 func (s *State) NumParams() core.ParamIdx {
 	return 1
 }
