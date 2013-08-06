@@ -18,7 +18,7 @@ func MakeState(sampleRate core.Quantity) *State {
 	s.f_g.SetHandler(func(p core.Param) {
 		s.setFrequency(p.Val())
 	})
-	s.f_g.setPos(.5)
+	s.f_g.SetPos(.5)
 	return s
 }
 

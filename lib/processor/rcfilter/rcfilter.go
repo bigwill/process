@@ -23,7 +23,7 @@ func MakeState(sampleRate core.Quantity) *State {
 	s.f_c.SetHandler(func (p core.Param) {
 		s.setCutoff(p.Val())
 	})
-	s.f_c.setPos(.5)
+	s.f_c.SetPos(.5)
 	return s
 }
 
