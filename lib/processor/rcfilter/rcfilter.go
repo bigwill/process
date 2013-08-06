@@ -16,7 +16,7 @@ type State struct {
 	l core.Quantity
 }
 
-func MakeState(sampleRate core.Quantity) *State {
+func MakeProcessor(sampleRate core.Quantity) core.Processor {
 	// TODO: l value is zero by default for now
 	s := &State{sampleRate: sampleRate,
 		f_c: linear.MakeState("Cutoff", "Hz", 100.0, 10000.0, .5)}

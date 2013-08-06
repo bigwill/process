@@ -9,7 +9,7 @@ type State struct {
 	g core.Param
 }
 
-func MakeState(sample_rate core.Quantity) *State {
+func MakeProcessor(sample_rate core.Quantity) core.Processor {
 	return &State{g: linear.MakeState("Gain", "dB", 0, 1, .8)}
 }
 
