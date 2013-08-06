@@ -3,9 +3,12 @@ package rcfilter
 import (
 	"math"
 	"github.com/bigwill/process/core"
+	"github.com/bigwill/process/lib/params/linear"
 )
 
 type State struct {
+	sampleRate core.Quantity
+	f_c core.Param
 	v_o_n1 core.Quantity
 	v_i_n1 core.Quantity
 	i_n1 core.Quantity
@@ -13,14 +16,27 @@ type State struct {
 	l core.Quantity
 }
 
-func MakeState(sample_rate core.Quantity) *State {
-	var f_c core.Quantity = 1000.0 // 1kHZ cutoff frequency
-	var RC core.Quantity = 1 / (2.0 * math.Pi * f_c)
-
+func MakeState(sampleRate core.Quantity) *State {
 	// TODO: l value is zero by default for now
-	T := 1 / sample_rate
-	s := &State{k: T / RC}
+	s := &State{sampleRate: sampleRate,
+		f_c: linear.MakeState("Cutoff", "Hz", 100.0, 10000.0, .5)}
+	s.f_c.SetHandler(func (p core.Param) {
+		s.setCutoff(p.Val())
+	})
+	s.f_c.setPos(.5)
 	return s
+}
+
+func (s *State) GetNumParams() core.ParamIdx {
+	return 1
+}
+
+func (s *State) GetParam(idx core.ParamIdx) core.Param {
+	if idx == 0 {
+		return s.f_c
+	} else {
+		return nil
+	}
 }
 
 func (s *State) Process(v_i_n core.Quantity) core.Quantity {
@@ -34,4 +50,9 @@ func (s *State) Process(v_i_n core.Quantity) core.Quantity {
 	s.i_n1 = i_n
 
 	return v_o_n
+}
+
+func (s *State) setCutoff(f_c core.Quantity) {
+	var RC core.Quantity = 1 / (2.0 * math.Pi * f_c)
+	s.k = 1 / (s.sampleRate * RC)
 }
