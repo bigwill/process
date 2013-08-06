@@ -5,7 +5,6 @@ type Index int64
 type ParamIdx int16
 
 type Param interface {
-	SetName(string)
 	Name() string
 	SetHandler(func(Param))
 	// Pos must be 0.0-1.0 inclusive linear/"physical" control position

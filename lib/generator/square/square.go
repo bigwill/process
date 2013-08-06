@@ -8,7 +8,7 @@ import (
 type State struct {
 	sampleRate core.Quantity
 	f_g core.Param
-	T int64 // wave period in terms of samples @ the given sample rate
+	t int64 // wave period in terms of samples @ the given sample rate
 	i int64 // current index in wave period
 }
 
@@ -35,10 +35,10 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 }
 
 func (s *State) Generate() core.Quantity {
-	defer func (t *State) {
-		t.i = (t.i + 1) % t.T
+	defer func (q *State) {
+		q.i = (q.i + 1) % q.t
 	}(s)
-	if s.i <= s.T / 2 {
+	if s.i <= s.t / 2 {
 		return 1.0
 	} else {
 		return -1.0
@@ -46,5 +46,5 @@ func (s *State) Generate() core.Quantity {
 }
 
 func (s *State) setFrequency(f_g core.Quantity) {
-	s.T = int64(s.sampleRate / f_g)
+	s.t = int64(s.sampleRate / f_g)
 }

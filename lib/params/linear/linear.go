@@ -21,10 +21,6 @@ func MakeState(name string, units string, minVal core.Quantity, maxVal core.Quan
 	return s
 }
 
-func (s *State) SetName(aName string) {
-	s.name = aName
-}
-
 func (s *State) Name() string {
 	return s.name
 }
