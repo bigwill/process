@@ -12,9 +12,9 @@ type State struct {
 	i int64 // current index in wave period
 }
 
-func MakeGenerator(sampleRate core.Quantity) core.Generator {
+func NewGenerator(sampleRate core.Quantity) core.Generator {
 	s := &State{sampleRate: sampleRate,
-		f_g: linear.MakeState("Freq", "Hz", 30, 10000, .5)}
+		f_g: linear.NewState("Freq", "Hz", 30, 10000, .5)}
 	s.f_g.SetHandler(func(p core.Param) {
 		s.setFrequency(p.Val())
 	})

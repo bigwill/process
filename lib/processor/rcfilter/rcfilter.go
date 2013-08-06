@@ -16,10 +16,10 @@ type State struct {
 	l core.Quantity
 }
 
-func MakeProcessor(sampleRate core.Quantity) core.Processor {
+func NewProcessor(sampleRate core.Quantity) core.Processor {
 	// TODO: l value is zero by default for now
 	s := &State{sampleRate: sampleRate,
-		f_c: linear.MakeState("Cutoff", "Hz", 100.0, 10000.0, .5)}
+		f_c: linear.NewState("Cutoff", "Hz", 100.0, 10000.0, .5)}
 	s.f_c.SetHandler(func (p core.Param) {
 		s.setCutoff(p.Val())
 	})

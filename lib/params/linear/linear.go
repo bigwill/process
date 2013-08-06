@@ -15,7 +15,7 @@ type State struct {
 	curVal core.Quantity
 }
 
-func MakeState(name string, units string, minVal core.Quantity, maxVal core.Quantity, curPos core.Quantity) *State {
+func NewState(name string, units string, minVal core.Quantity, maxVal core.Quantity, curPos core.Quantity) *State {
 	s := &State{name: name, units: units, minVal: minVal, maxVal: maxVal, curPos: curPos}
 	s.SetPos(curPos)
 	return s

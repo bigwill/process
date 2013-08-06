@@ -10,9 +10,9 @@ import (
 )
 
 func main() {
-	var square core.Generator = square.MakeGenerator(48000.0)
-	var filter core.Processor = rcfilter.MakeProcessor(48000.0)
-	var gain core.Processor = gain.MakeProcessor(48000.0)
+	var square core.Generator = square.NewGenerator(48000.0)
+	var filter core.Processor = rcfilter.NewProcessor(48000.0)
+	var gain core.Processor = gain.NewProcessor(48000.0)
 	filter.Param(0).SetPos(.2)
 	square.Param(0).SetPos(.6)
 
