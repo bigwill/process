@@ -22,11 +22,11 @@ func MakeGenerator(sampleRate core.Quantity) core.Generator {
 	return s
 }
 
-func (s *State) GetNumParams() core.ParamIdx {
+func (s *State) NumParams() core.ParamIdx {
 	return 1
 }
 
-func (s *State) GetParam(idx core.ParamIdx) core.Param {
+func (s *State) Param(idx core.ParamIdx) core.Param {
 	if idx == 0 {
 		return s.f_g
 	} else {

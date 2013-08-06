@@ -13,11 +13,11 @@ func main() {
 	var square core.Generator = square.MakeGenerator(48000.0)
 	var filter core.Processor = rcfilter.MakeProcessor(48000.0)
 	var gain core.Processor = gain.MakeProcessor(48000.0)
-	filter.GetParam(0).SetPos(.2)
-	square.GetParam(0).SetPos(.6)
+	filter.Param(0).SetPos(.2)
+	square.Param(0).SetPos(.6)
 
-	log.Printf("Osc freq %s", square.GetParam(0).Repr())
-	log.Printf("Cutoff %s", filter.GetParam(0).Repr())
+	log.Printf("Osc freq %s", square.Param(0).Repr())
+	log.Printf("Cutoff %s", filter.Param(0).Repr())
 
 	for i := 0; i < 4800; i++ {
 		fmt.Printf("%v\t%v\n", i, gain.Process(filter.Process(square.Generate())))

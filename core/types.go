@@ -18,8 +18,8 @@ type Param interface {
 }
 
 type Paramer interface {
-	GetNumParams() ParamIdx
-	GetParam(ParamIdx) Param
+	NumParams() ParamIdx
+	Param(ParamIdx) Param
 }
 
 type Generator interface {

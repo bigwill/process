@@ -13,11 +13,11 @@ func MakeProcessor(sample_rate core.Quantity) core.Processor {
 	return &State{g: linear.MakeState("Gain", "dB", 0, 1, .8)}
 }
 
-func (s *State) GetNumParams() core.ParamIdx {
+func (s *State) NumParams() core.ParamIdx {
 	return 1
 }
 
-func (s *State) GetParam(idx core.ParamIdx) core.Param {
+func (s *State) Param(idx core.ParamIdx) core.Param {
 	if idx == 0 {
 		return s.g
 	} else {
