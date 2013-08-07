@@ -5,7 +5,6 @@ type Index int64
 type ParamIdx int16
 type Control int16
 
-
 // Control constants
 const (
 	Quit = 0

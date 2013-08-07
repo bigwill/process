@@ -1,6 +1,6 @@
 package core
 
-func RunChain(gen Generator, procs []Processor) (chan Quantity, []chan Control)  {
+func RunChain(gen Generator, procs []Processor) (chan Quantity, []chan Control) {
 	ctrls := make([]chan Control, 1+len(procs), 1+len(procs))
 	var inChan, outChan chan Quantity
 
@@ -23,7 +23,7 @@ func newGeneratorRoutine(g Generator, out chan Quantity, ctrl chan Control) func
 	return func() {
 		for {
 			select {
-			case ctrlVal := <- ctrl:
+			case ctrlVal := <-ctrl:
 				if ctrlVal == Quit {
 					return
 				}
@@ -37,11 +37,11 @@ func newProcessorRoutine(p Processor, in, out chan Quantity, ctrl chan Control) 
 	return func() {
 		for {
 			select {
-			case ctrlVal := <- ctrl:
+			case ctrlVal := <-ctrl:
 				if ctrlVal == Quit {
 					return
 				}
-			case out <- p.Process(<- in):
+			case out <- p.Process(<-in):
 			}
 		}
 	}

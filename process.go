@@ -2,12 +2,12 @@ package main
 
 import (
 	"encoding/binary"
-	"log"
-	"os"
 	"github.com/bigwill/process/core"
 	"github.com/bigwill/process/lib/generator/square"
 	"github.com/bigwill/process/lib/processor/gain"
 	"github.com/bigwill/process/lib/processor/rcfilter"
+	"log"
+	"os"
 )
 
 const bufferSize = 500
@@ -30,7 +30,7 @@ func main() {
 	buf := make([]core.Quantity, bufferSize, bufferSize)
 	for {
 		for i := 0; i < bufferSize; i++ {
-			s := <- outChan
+			s := <-outChan
 			buf[i] = s
 		}
 		err := binary.Write(os.Stdout, binary.LittleEndian, buf)
