@@ -33,7 +33,11 @@ type Generator interface {
 	Generate() Quantity
 }
 
+type GeneratorRoutine func(in chan Quantity, out chan Control)
+
 type Processor interface {
 	Paramer
 	Process(Quantity) Quantity
 }
+
+type ProcessorRoutine func(in chan Quantity, out chan Quantity, ctrl chan Control)
