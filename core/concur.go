@@ -1,17 +1,17 @@
 package core
 
-func RunChain(gen Generator, procs []Processor) (chan Quantity, []chan Control) {
-	ctrls := make([]chan Control, 1+len(procs), 1+len(procs))
-	var inChan, outChan chan Quantity
+func RunChain(gen Generator, procs []Processor) (SampleChannel, []ControlChannel) {
+	ctrls := make([]ControlChannel, 1+len(procs), 1+len(procs))
+	var inChan, outChan SampleChannel
 
-	ctrls[0] = make(chan Control)
-	genOut := make(chan Quantity)
+	ctrls[0] = make(ControlChannel)
+	genOut := make(SampleChannel)
 	go newGeneratorRoutine(gen)(genOut, ctrls[0])
 	inChan = genOut
 
 	for i, proc := range procs {
-		ctrls[i+1] = make(chan Control)
-		outChan = make(chan Quantity)
+		ctrls[i+1] = make(ControlChannel)
+		outChan = make(SampleChannel)
 		go newProcessorRoutine(proc)(inChan, outChan, ctrls[i+1])
 		inChan = outChan
 	}
@@ -20,7 +20,7 @@ func RunChain(gen Generator, procs []Processor) (chan Quantity, []chan Control) 
 }
 
 func newGeneratorRoutine(g Generator) GeneratorRoutine {
-	return func(out chan Quantity, ctrl chan Control) {
+	return func(out SampleChannel, ctrl ControlChannel) {
 		for {
 			select {
 			case ctrlVal := <-ctrl:
@@ -34,7 +34,7 @@ func newGeneratorRoutine(g Generator) GeneratorRoutine {
 }
 
 func newProcessorRoutine(p Processor) ProcessorRoutine {
-	return func(in chan Quantity, out chan Quantity, ctrl chan Control) {
+	return func(in SampleChannel, out SampleChannel, ctrl ControlChannel) {
 		for {
 			select {
 			case ctrlVal := <-ctrl:

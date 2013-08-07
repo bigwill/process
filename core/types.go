@@ -5,6 +5,9 @@ type Index int64
 type ParamIdx int16
 type Control int16
 
+type ControlChannel chan Control
+type SampleChannel chan Quantity
+
 // Control constants
 const (
 	Quit = 0
@@ -33,11 +36,11 @@ type Generator interface {
 	Generate() Quantity
 }
 
-type GeneratorRoutine func(in chan Quantity, out chan Control)
+type GeneratorRoutine func(in SampleChannel, out ControlChannel)
 
 type Processor interface {
 	Paramer
 	Process(Quantity) Quantity
 }
 
-type ProcessorRoutine func(in chan Quantity, out chan Quantity, ctrl chan Control)
+type ProcessorRoutine func(in SampleChannel, out SampleChannel, ctrl ControlChannel)
