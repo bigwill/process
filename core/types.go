@@ -3,6 +3,13 @@ package core
 type Quantity float64
 type Index int64
 type ParamIdx int16
+type Control int16
+
+
+// Control constants
+const (
+	Quit = 0
+)
 
 type Param interface {
 	Name() string

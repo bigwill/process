@@ -13,20 +13,25 @@ import (
 const bufferSize = 500
 
 func main() {
-	var square core.Generator = square.NewGenerator(48000.0)
-	var filter core.Processor = rcfilter.NewProcessor(48000.0)
-	var gain core.Processor = gain.NewProcessor(48000.0)
-	filter.Param(0).SetPos(.2)
-	square.Param(0).SetPos(.1)
-	gain.Param(0).SetPos(.5)
+	sqG := square.NewGenerator(48000.0)
+	sqG.Param(0).SetPos(.1)
 
-	log.Printf("%s %s", square.Name(), square.Param(0).Repr())
-	log.Printf("%s %s", filter.Name(), filter.Param(0).Repr())
+	rcfP := rcfilter.NewProcessor(48000.0)
+	rcfP.Param(0).SetPos(.2)
+
+	gainP := gain.NewProcessor(48000.0)
+	gainP.Param(0).SetPos(.5)
+
+	outChan, _ := core.RunChain(sqG, []core.Processor{rcfP, gainP})
+
+	log.Printf("%s %s", sqG.Name(), sqG.Param(0).Repr())
+	log.Printf("%s %s", rcfP.Name(), rcfP.Param(0).Repr())
 
 	buf := make([]core.Quantity, bufferSize, bufferSize)
 	for {
 		for i := 0; i < bufferSize; i++ {
-			buf[i] = gain.Process(filter.Process(square.Generate()))
+			s := <- outChan
+			buf[i] = s
 		}
 		err := binary.Write(os.Stdout, binary.LittleEndian, buf)
 		if err != nil {
