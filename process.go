@@ -20,9 +20,10 @@ func main() {
 	rcfP.Param(0).SetPos(.2)
 
 	gainP := gain.NewProcessor(48000.0)
-	gainP.Param(0).SetPos(.5)
+	gainP.Param(0).SetPos(.1)
+	log.Printf("%v", gainP.Param(0).Val())
 
-	outChan, _ := core.RunChain(sqG, []core.Processor{rcfP, gainP})
+	outChan, _ := core.RunGeneratorChain(sqG, []core.Processor{rcfP, gainP})
 
 	log.Printf("%s %s", sqG.Name(), sqG.Param(0).Repr())
 	log.Printf("%s %s", rcfP.Name(), rcfP.Param(0).Repr())

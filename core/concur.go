@@ -1,22 +1,31 @@
 package core
 
-func RunChain(gen Generator, procs []Processor) (SampleChannel, []ControlChannel) {
+func RunGeneratorChain(gen Generator, procs []Processor) (SampleChannel, []ControlChannel) {
 	ctrls := make([]ControlChannel, 1+len(procs), 1+len(procs))
-	var inChan, outChan SampleChannel
+	genOut, outChan, procCtrls := RunProcessorChain(procs)
 
-	ctrls[0] = make(ControlChannel)
-	genOut := make(SampleChannel)
+	for i, pc := range procCtrls {
+		ctrls[i+1] = pc
+	}
+
 	go newGeneratorRoutine(gen)(genOut, ctrls[0])
-	inChan = genOut
+	return outChan, ctrls
+}
+
+func RunProcessorChain(procs []Processor) (SampleChannel, SampleChannel, []ControlChannel) {
+	ctrls := make([]ControlChannel, len(procs), len(procs))
+	chainInChan := make(SampleChannel)
+	inChan := chainInChan
+	var outChan SampleChannel
 
 	for i, proc := range procs {
-		ctrls[i+1] = make(ControlChannel)
+		ctrls[i] = make(ControlChannel)
 		outChan = make(SampleChannel)
-		go newProcessorRoutine(proc)(inChan, outChan, ctrls[i+1])
+		go newProcessorRoutine(proc)(inChan, outChan, ctrls[i])
 		inChan = outChan
 	}
 
-	return outChan, ctrls
+	return chainInChan, outChan, ctrls
 }
 
 func newGeneratorRoutine(g Generator) GeneratorRoutine {
