@@ -6,13 +6,13 @@ func RunChain(gen Generator, procs []Processor) (chan Quantity, []chan Control) 
 
 	ctrls[0] = make(chan Control)
 	genOut := make(chan Quantity)
-	go newGeneratorRoutine(Generator(gen))(genOut, ctrls[0])
+	go newGeneratorRoutine(gen)(genOut, ctrls[0])
 	inChan = genOut
 
 	for i, proc := range procs {
 		ctrls[i+1] = make(chan Control)
 		outChan = make(chan Quantity)
-		go newProcessorRoutine(Processor(proc))(inChan, outChan, ctrls[i+1])
+		go newProcessorRoutine(proc)(inChan, outChan, ctrls[i+1])
 		inChan = outChan
 	}
 
