@@ -3,21 +3,37 @@ package core
 type Quantity float64
 type Index int64
 type ParamIdx int16
-type Control int16
 
-type MonitorMessage struct {
-	Code int16
-	Error error
+type Message interface {
+	Code() int16
 }
 
-type ControlChannel chan Control
+type ControlMessage Message
+
+type MonitorMessage interface {
+	Message
+	ParamerName() string
+}
+
+type MidiControlMessage interface {
+	ControlMessage
+	Midi() MidiMessage
+}
+
+type ErrorMonitorMessage interface {
+	MonitorMessage
+	Err() error
+}
+
+type ControlChannel chan ControlMessage
 type MonitorChannel chan MonitorMessage
 type SampleChannel chan Quantity
 
-// Control constants
+// Message codes
 const (
 	Quit = 0
 	Error
+	Midi
 )
 
 type Param interface {

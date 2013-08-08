@@ -1,9 +1,5 @@
 package core
 
-import (
-	"log"
-)
-
 func RunChain(src Source, procs []Processor, snk Sink) ([]ControlChannel, MonitorChannel) {
 	ctrls := make([]ControlChannel, 2+len(procs), 2+len(procs))
 	ctrls[0] = make(ControlChannel)
@@ -39,19 +35,22 @@ func runProcessors(procs []Processor, mon MonitorChannel) (SampleChannel, Sample
 	return chainInChan, outChan, ctrls
 }
 
+func runMidi(ctrls []ControlChannel, mon MonitorChannel) {
+        go midiRoutine(ctrls, mon)
+}
+
 func newSourceRoutine(src Source) SourceRoutine {
 	return func(out SampleChannel, ctrl ControlChannel, mon MonitorChannel) {
 		for {
 			select {
-			case ctrlVal := <-ctrl:
-				if ctrlVal == Quit {
+			case ctrlMsg := <-ctrl:
+				if ctrlMsg.Code() == Quit {
 					return
 				}
 			default:
 				v, err := src.Output()
 				if err != nil {
-					log.Println(err)
-					mon <- MonitorQuit()
+					mon <- MonitorError(src.Name(), err)
 				}
 				out <- v
 			}
@@ -63,15 +62,14 @@ func newSinkRoutine(snk Sink) SinkRoutine {
 	return func(in SampleChannel, ctrl ControlChannel, mon MonitorChannel) {
 		for {
 			select {
-			case ctrlVal := <-ctrl:
-				if ctrlVal == Quit {
+			case ctrlMsg := <-ctrl:
+				if ctrlMsg.Code() == Quit {
 					return
 				}
 			case v := <-in:
 				err := snk.Input(v)
 				if err != nil {
-					log.Println(err)
-					mon <- MonitorQuit()
+					mon <- MonitorError(snk.Name(), err)
 				}
 			}
 		}
@@ -82,15 +80,14 @@ func newProcessorRoutine(p Processor) ProcessorRoutine {
 	return func(in SampleChannel, out SampleChannel, ctrl ControlChannel, mon MonitorChannel) {
 		for {
 			select {
-			case ctrlVal := <-ctrl:
-				if ctrlVal == Quit {
+			case ctrlMsg := <-ctrl:
+				if ctrlMsg.Code() == Quit {
 					return
 				}
 			case v := <-in:
 				w, err := p.Process(v)
 				if err != nil {
-					log.Println(err)
-					mon <- MonitorQuit()
+					mon <- MonitorError(p.Name(), err)
 				}
 				out <- w
 			}
