@@ -31,12 +31,12 @@ type Paramer interface {
 	Param(ParamIdx) Param
 }
 
-type Generator interface {
+type Source interface {
 	Paramer
-	Generate() Quantity
+	Output() Quantity
 }
 
-type GeneratorRoutine func(in SampleChannel, out ControlChannel)
+type SourceRoutine func(out SampleChannel, ctrl ControlChannel)
 
 type Processor interface {
 	Paramer
@@ -44,3 +44,10 @@ type Processor interface {
 }
 
 type ProcessorRoutine func(in SampleChannel, out SampleChannel, ctrl ControlChannel)
+
+type Sink interface {
+	Paramer
+	Input(Quantity) error
+}
+
+type SinkRoutine func(out SampleChannel, ctrl ControlChannel)

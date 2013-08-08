@@ -1,18 +1,23 @@
 package core
 
-func RunGeneratorChain(gen Generator, procs []Processor) (SampleChannel, []ControlChannel) {
-	ctrls := make([]ControlChannel, 1+len(procs), 1+len(procs))
-	genOut, outChan, procCtrls := RunProcessorChain(procs)
+func RunChain(src Source, procs []Processor, snk Sink) []ControlChannel {
+	ctrls := make([]ControlChannel, 2+len(procs), 2+len(procs))
+	ctrls[0] = make(ControlChannel)
+	ctrls[len(ctrls)-1] = make(ControlChannel)
+
+	srcOut, snkIn, procCtrls := runProcessors(procs)
 
 	for i, pc := range procCtrls {
 		ctrls[i+1] = pc
 	}
 
-	go newGeneratorRoutine(gen)(genOut, ctrls[0])
-	return outChan, ctrls
+	go newSinkRoutine(snk)(snkIn, ctrls[len(ctrls)-1])
+	go newSourceRoutine(src)(srcOut, ctrls[0])
+
+	return ctrls
 }
 
-func RunProcessorChain(procs []Processor) (SampleChannel, SampleChannel, []ControlChannel) {
+func runProcessors(procs []Processor) (SampleChannel, SampleChannel, []ControlChannel) {
 	ctrls := make([]ControlChannel, len(procs), len(procs))
 	chainInChan := make(SampleChannel)
 	inChan := chainInChan
@@ -28,7 +33,7 @@ func RunProcessorChain(procs []Processor) (SampleChannel, SampleChannel, []Contr
 	return chainInChan, outChan, ctrls
 }
 
-func newGeneratorRoutine(g Generator) GeneratorRoutine {
+func newSourceRoutine(src Source) SourceRoutine {
 	return func(out SampleChannel, ctrl ControlChannel) {
 		for {
 			select {
@@ -36,7 +41,22 @@ func newGeneratorRoutine(g Generator) GeneratorRoutine {
 				if ctrlVal == Quit {
 					return
 				}
-			case out <- g.Generate():
+			case out <- src.Output():
+			}
+		}
+	}
+}
+
+func newSinkRoutine(snk Sink) SinkRoutine {
+	return func(in SampleChannel, ctrl ControlChannel) {
+		for {
+			select {
+			case ctrlVal := <-ctrl:
+				if ctrlVal == Quit {
+					return
+				}
+			case v := <-in:
+				snk.Input(v)
 			}
 		}
 	}
@@ -50,7 +70,8 @@ func newProcessorRoutine(p Processor) ProcessorRoutine {
 				if ctrlVal == Quit {
 					return
 				}
-			case out <- p.Process(<-in):
+			case v := <-in:
+				out <- p.Process(v)
 			}
 		}
 	}

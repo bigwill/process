@@ -12,7 +12,7 @@ type State struct {
 	i          int64 // current index in wave period
 }
 
-func NewGenerator(sampleRate core.Quantity) core.Generator {
+func NewSource(sampleRate core.Quantity) core.Source {
 	s := &State{sampleRate: sampleRate,
 		f_g: linear.NewState("Freq", "Hz", 30, 10000, .5)}
 	s.f_g.SetHandler(func(p core.Param) {
@@ -38,7 +38,7 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Generate() core.Quantity {
+func (s *State) Output() core.Quantity {
 	defer func(q *State) {
 		q.i = (q.i + 1) % q.t
 	}(s)
