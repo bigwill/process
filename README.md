@@ -1,7 +1,7 @@
 # Using process
 
-After building the project, you can hear process make noise by doing this:
+After building the project, just run the process command.
 
-$ sox <AUDIO FILE> -t f64 -r 48k -c 1 - | process | play -t f64 -r 48k -c 1 -
+Requires sox and play commands available in the sox project (http://sox.sourceforge.net/)
 
-sox and play commands are available in the sox project (http://sox.sourceforge.net/)
+Needs a lot of work to be more interesting

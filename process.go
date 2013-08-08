@@ -4,8 +4,8 @@ import (
 	"github.com/bigwill/process/core"
 	"github.com/bigwill/process/lib/processor/gain"
 	"github.com/bigwill/process/lib/processor/rcfilter"
-	"github.com/bigwill/process/lib/sink/stdout"
-	"github.com/bigwill/process/lib/source/stdin"
+	"github.com/bigwill/process/lib/sink/play"
+	"github.com/bigwill/process/lib/source/sox"
 	"log"
 )
 
@@ -14,7 +14,7 @@ const sampleRate = 48000.0
 
 func main() {
 	// Source
-	stdinS := stdin.NewSource(sampleRate)
+	src := sox.NewSource(sampleRate)
 
 	// Processors
 	rcfP := rcfilter.NewProcessor(sampleRate)
@@ -24,9 +24,9 @@ func main() {
 	gainP.Param(0).SetPos(.1)
 
 	// Sink
-	stdoutSink := stdout.NewSink(sampleRate)
+	snk := play.NewSink(sampleRate)
 
-	_, monChan := core.RunChain(stdinS, []core.Processor{rcfP, gainP}, stdoutSink)
+	_, monChan := core.RunChain(src, []core.Processor{rcfP, gainP}, snk)
 
 	for {
 		m := <-monChan
