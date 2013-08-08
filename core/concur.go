@@ -1,6 +1,6 @@
 package core
 
-func RunChain(src Source, procs []Processor, snk Sink) ([]ControlChannel, MonitorChannel) {
+func RunChain(src Source, procs []Processor, snk Sink, midiSrc MidiSource) ([]ControlChannel, MonitorChannel) {
 	ctrls := make([]ControlChannel, 2+len(procs), 2+len(procs))
 	ctrls[0] = make(ControlChannel)
 	ctrls[len(ctrls)-1] = make(ControlChannel)
@@ -15,6 +15,10 @@ func RunChain(src Source, procs []Processor, snk Sink) ([]ControlChannel, Monito
 
 	go sinkRoutine(snk, snkIn, ctrls[0], monChan)
 	go sourceRoutine(src, srcOut, ctrls[len(ctrls)-1], monChan)
+
+	if midiSrc != nil {
+		go midiRoutine(midiSrc, ctrls, monChan)
+	}
 
 	return ctrls, monChan
 }
@@ -33,10 +37,6 @@ func runProcessors(procs []Processor, mon MonitorChannel) (SampleChannel, Sample
 	}
 
 	return chainInChan, outChan, ctrls
-}
-
-func runMidi(ctrls []ControlChannel, mon MonitorChannel) {
-        go midiRoutine(ctrls, mon)
 }
 
 func sourceRoutine(src Source, out SampleChannel, ctrl ControlChannel, mon MonitorChannel) {
@@ -85,6 +85,19 @@ func processorRoutine(p Processor, in SampleChannel, out SampleChannel, ctrl Con
 				mon <- MonitorError(p.Name(), err)
 			}
 			out <- w
+		}
+	}
+}
+
+func midiRoutine(midiSrc MidiSource, ctrls []ControlChannel, mon MonitorChannel) {
+	for {
+		midiMsg, err := midiSrc.Output()
+		if err != nil {
+			mon <- MonitorError(midiSrc.Name(), err)
+		}
+
+		if int(midiMsg.Channel()) < len(ctrls) {
+			ctrls[midiMsg.Channel()] <- midiSrc.Mapper().Map(midiMsg)
 		}
 	}
 }

@@ -15,9 +15,10 @@ type MonitorMessage interface {
 	ParamerName() string
 }
 
-type MidiControlMessage interface {
+type ParamControlMessage interface {
 	ControlMessage
-	Midi() MidiMessage
+	Index() ParamIdx
+	Pos() Quantity
 }
 
 type ErrorMonitorMessage interface {
@@ -33,7 +34,7 @@ type SampleChannel chan Quantity
 const (
 	Quit = 0
 	Error
-	Midi
+	ParamChange
 )
 
 type Param interface {
@@ -67,4 +68,14 @@ type Processor interface {
 type Sink interface {
 	Paramer
 	Input(Quantity) error
+}
+
+type MidiSource interface {
+	Name() string
+	Output() (MidiMessage, error)
+	Mapper() MidiMapper
+}
+
+type MidiMapper interface {
+	Map(MidiMessage) ParamControlMessage
 }

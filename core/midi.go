@@ -3,7 +3,6 @@ package core
 import (
 	"encoding/binary"
 	"io"
-	"os"
 )
 
 const (
@@ -58,30 +57,17 @@ func (s state) Pitch() uint16 {
 	return s.pitch
 }
 
-func midiRoutine(ctrls []ControlChannel, mon MonitorChannel) {
-	for {
-		midiMsg := readMidi(os.Stdin)
-		if midiMsg == nil {
-			continue
-		}
-
-		if int(midiMsg.Channel()) < len(ctrls) {
-			ctrls[midiMsg.Channel()] <- NewMidiControlMessage(midiMsg)
-		}
-	}
-}
-
 func newMidiMessage(e byte, ch byte, key byte, val byte, prog byte, pitch uint16) MidiMessage {
 	return state{event: e, channel: ch, key: key, value: val, program: prog, pitch: pitch}
 }
 
-func readMidi(r io.Reader) MidiMessage {
+func ReadMidi(r io.Reader) (MidiMessage, error) {
 	for {
 		var evChan, event, channel, key, value uint8
 
 		err := binary.Read(r, binary.LittleEndian, &evChan)
 		if err != nil {
-			return nil
+			return nil, err
 		}
 
 		channel = evChan & 0x0f
@@ -97,29 +83,29 @@ func readMidi(r io.Reader) MidiMessage {
 		case ControlChange:
 			err := binary.Read(r, binary.LittleEndian, &key)
 			if err != nil {
-				return nil
+				return nil, err
 			}
 
 			err = binary.Read(r, binary.LittleEndian, &value)
 			if err != nil {
-				return nil
+				return nil, err
 			}
 
-			return newMidiMessage(event, channel, key, value, 0, 0)
+			return newMidiMessage(event, channel, key, value, 0, 0), nil
 		case ProgramChange: // TODO: handle program change
 			fallthrough
 		case ChannelPressure: // TODO: handle channel pressure
 			var scratch byte
 			err := binary.Read(r, binary.LittleEndian, &scratch)
 			if err != nil {
-				return nil
+				return nil, err
 			}
 
 		case PitchWheelChange: // TODO: handle pitch wheel
 			var scratch uint16
 			err := binary.Read(r, binary.LittleEndian, &scratch)
 			if err != nil {
-				return nil
+				return nil, err
 			}
 		}
 	}
