@@ -1,9 +1,11 @@
 package core
 
-func RunChain(src Source, procs []Processor, snk Sink) ([]ControlChannel, MonitorChannel) {
+const controlChannelBufferSize = 100
+
+func RunChain(src Source, procs []Processor, snk Sink, midiSrc MidiSource) ([]ControlChannel, MonitorChannel) {
 	ctrls := make([]ControlChannel, 2+len(procs), 2+len(procs))
-	ctrls[0] = make(ControlChannel)
-	ctrls[len(ctrls)-1] = make(ControlChannel)
+	ctrls[0] = makeBufferControlChannel()
+	ctrls[len(ctrls)-1] = makeBufferControlChannel()
 
 	monChan := make(MonitorChannel)
 
@@ -16,7 +18,15 @@ func RunChain(src Source, procs []Processor, snk Sink) ([]ControlChannel, Monito
 	go sinkRoutine(snk, snkIn, ctrls[0], monChan)
 	go sourceRoutine(src, srcOut, ctrls[len(ctrls)-1], monChan)
 
+	if midiSrc != nil {
+		go midiRoutine(midiSrc, ctrls, monChan)
+	}
+
 	return ctrls, monChan
+}
+
+func makeBufferControlChannel() ControlChannel {
+	return make(ControlChannel, controlChannelBufferSize)
 }
 
 func runProcessors(procs []Processor, mon MonitorChannel) (SampleChannel, SampleChannel, []ControlChannel) {
@@ -26,17 +36,13 @@ func runProcessors(procs []Processor, mon MonitorChannel) (SampleChannel, Sample
 	var outChan SampleChannel
 
 	for i, proc := range procs {
-		ctrls[i] = make(ControlChannel)
+		ctrls[i] = makeBufferControlChannel()
 		outChan = make(SampleChannel)
 		go processorRoutine(proc, inChan, outChan, ctrls[i], mon)
 		inChan = outChan
 	}
 
 	return chainInChan, outChan, ctrls
-}
-
-func runMidi(ctrls []ControlChannel, mon MonitorChannel) {
-        go midiRoutine(ctrls, mon)
 }
 
 func sourceRoutine(src Source, out SampleChannel, ctrl ControlChannel, mon MonitorChannel) {
@@ -85,6 +91,19 @@ func processorRoutine(p Processor, in SampleChannel, out SampleChannel, ctrl Con
 				mon <- MonitorError(p.Name(), err)
 			}
 			out <- w
+		}
+	}
+}
+
+func midiRoutine(midiSrc MidiSource, ctrls []ControlChannel, mon MonitorChannel) {
+	for {
+		midiMsg, err := midiSrc.Output()
+		if err != nil {
+			mon <- MonitorError(midiSrc.Name(), err)
+		}
+
+		if int(midiMsg.Channel()) < len(ctrls) {
+			ctrls[midiMsg.Channel()] <- midiSrc.Mapper().Map(midiMsg)
 		}
 	}
 }
