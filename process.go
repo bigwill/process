@@ -9,20 +9,21 @@ import (
 )
 
 const bufferSize = 500
+const sampleRate = 48000.0
 
 func main() {
 	// Source
-	stdinS := stdin.NewSource(48000.0)
+	stdinS := stdin.NewSource(sampleRate)
 
 	// Processors
-	rcfP := rcfilter.NewProcessor(48000.0)
+	rcfP := rcfilter.NewProcessor(sampleRate)
 	rcfP.Param(0).SetPos(.2)
 
-	gainP := gain.NewProcessor(48000.0)
+	gainP := gain.NewProcessor(sampleRate)
 	gainP.Param(0).SetPos(.1)
 
 	// Sink
-	stdoutSink := stdout.NewSink(48000.0)
+	stdoutSink := stdout.NewSink(sampleRate)
 
 	_, monChan := core.RunChain(stdinS, []core.Processor{rcfP, gainP}, stdoutSink)
 
