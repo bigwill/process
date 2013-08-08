@@ -59,18 +59,12 @@ type Source interface {
 	Output() (Quantity, error)
 }
 
-type SourceRoutine func(out SampleChannel, ctrl ControlChannel, mon MonitorChannel)
-
 type Processor interface {
 	Paramer
 	Process(Quantity) (Quantity, error)
 }
 
-type ProcessorRoutine func(in SampleChannel, out SampleChannel, ctrl ControlChannel, mon MonitorChannel)
-
 type Sink interface {
 	Paramer
 	Input(Quantity) error
 }
-
-type SinkRoutine func(out SampleChannel, ctrl ControlChannel, mon MonitorChannel)
