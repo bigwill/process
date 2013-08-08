@@ -43,7 +43,7 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Process(v_i_n core.Quantity) core.Quantity {
+func (s *State) Process(v_i_n core.Quantity) (core.Quantity, error) {
 	// Processing
 	i_n := s.v_i_n1 - s.v_o_n1
 	v_o_n := s.v_o_n1 + s.k*i_n + s.l*(i_n-s.i_n1)
@@ -53,7 +53,7 @@ func (s *State) Process(v_i_n core.Quantity) core.Quantity {
 	s.v_o_n1 = v_o_n
 	s.i_n1 = i_n
 
-	return v_o_n
+	return v_o_n, nil
 }
 
 func (s *State) setCutoff(f_c core.Quantity) {

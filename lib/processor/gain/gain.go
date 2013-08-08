@@ -29,6 +29,6 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Process(v_i_n core.Quantity) core.Quantity {
-	return s.g.Val() * v_i_n
+func (s *State) Process(v_i_n core.Quantity) (core.Quantity, error) {
+	return s.g.Val() * v_i_n, nil
 }

@@ -6,6 +6,7 @@ type ParamIdx int16
 type Control int16
 
 type ControlChannel chan Control
+type MonitorChannel chan Control
 type SampleChannel chan Quantity
 
 // Control constants
@@ -33,21 +34,21 @@ type Paramer interface {
 
 type Source interface {
 	Paramer
-	Output() Quantity
+	Output() (Quantity, error)
 }
 
-type SourceRoutine func(out SampleChannel, ctrl ControlChannel)
+type SourceRoutine func(out SampleChannel, ctrl ControlChannel, mon MonitorChannel)
 
 type Processor interface {
 	Paramer
-	Process(Quantity) Quantity
+	Process(Quantity) (Quantity, error)
 }
 
-type ProcessorRoutine func(in SampleChannel, out SampleChannel, ctrl ControlChannel)
+type ProcessorRoutine func(in SampleChannel, out SampleChannel, ctrl ControlChannel, mon MonitorChannel)
 
 type Sink interface {
 	Paramer
 	Input(Quantity) error
 }
 
-type SinkRoutine func(out SampleChannel, ctrl ControlChannel)
+type SinkRoutine func(out SampleChannel, ctrl ControlChannel, mon MonitorChannel)
