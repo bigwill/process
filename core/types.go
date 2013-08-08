@@ -5,13 +5,19 @@ type Index int64
 type ParamIdx int16
 type Control int16
 
+type MonitorMessage struct {
+	Code int16
+	Error error
+}
+
 type ControlChannel chan Control
-type MonitorChannel chan Control
+type MonitorChannel chan MonitorMessage
 type SampleChannel chan Quantity
 
 // Control constants
 const (
 	Quit = 0
+	Error
 )
 
 type Param interface {

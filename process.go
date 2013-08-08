@@ -28,7 +28,7 @@ func main() {
 
 	for {
 		m := <-monChan
-		if m == core.Quit {
+		if m.Code == core.Quit {
 			return
 		}
 	}

@@ -51,7 +51,7 @@ func newSourceRoutine(src Source) SourceRoutine {
 				v, err := src.Output()
 				if err != nil {
 					log.Println(err)
-					mon <- Quit
+					mon <- MonitorQuit()
 				}
 				out <- v
 			}
@@ -71,7 +71,7 @@ func newSinkRoutine(snk Sink) SinkRoutine {
 				err := snk.Input(v)
 				if err != nil {
 					log.Println(err)
-					mon <- Quit
+					mon <- MonitorQuit()
 				}
 			}
 		}
@@ -90,7 +90,7 @@ func newProcessorRoutine(p Processor) ProcessorRoutine {
 				w, err := p.Process(v)
 				if err != nil {
 					log.Println(err)
-					mon <- Quit
+					mon <- MonitorQuit()
 				}
 				out <- w
 			}
