@@ -20,7 +20,7 @@ func NewSource(sampleRate core.Quantity) core.Source {
 	s := &State{buf: make([]core.Quantity, bufferSize, bufferSize)}
 
 	// TODO: yuck. generalize this at some point
-	cmd := exec.Command("sox", "~/Downloads/VST/Crumar_Cello.wav", "-t", "f64", "-r", "48k", "-c", "1", "-")
+	cmd := exec.Command("sox", "~/go/process/src/github.com/bigwill/process/res/Crumar_Cello.wav", "-t", "f64", "-r", "48k", "-c", "1", "-")
 
 	var err error
 	s.reader, err = cmd.StdoutPipe()
