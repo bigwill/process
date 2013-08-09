@@ -38,10 +38,9 @@ func main() {
 		m := <-monChan
 		switch m := m.(type) {
 		case core.ErrorMonitorMessage:
-			log.Printf("err = %v", m.Err())
-			return
+			log.Printf("err = %v", m)
 		default:
-			log.Printf("code = %v", m.Code())
+			log.Printf("mon = %v", m)
 		}
 	}
 }

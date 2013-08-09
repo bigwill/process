@@ -13,7 +13,7 @@ type State struct {
 }
 
 func NewMidiSource(mapper core.MidiMapper) core.MidiSource {
-	cmd := exec.Command("/Users/will/git/ps3midi/ps3midi.py", "lightsaber")
+	cmd := exec.Command("/Users/will/git/ps3midi/ps3midi.py", "process")
 
 	reader, err := cmd.StdoutPipe()
 	if err != nil { // TODO: better error reporting
