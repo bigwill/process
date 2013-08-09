@@ -38,14 +38,14 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Output() core.Quantity {
+func (s *State) Output() (core.Quantity, error) {
 	defer func(q *State) {
 		q.i = (q.i + 1) % q.t
 	}(s)
 	if s.i <= s.t/2 {
-		return 1.0
+		return 1.0, nil
 	} else {
-		return -1.0
+		return -1.0, nil
 	}
 }
 

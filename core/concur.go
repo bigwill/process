@@ -100,6 +100,7 @@ func midiRoutine(midiSrc MidiSource, ctrls []ControlChannel, mon MonitorChannel)
 		midiMsg, err := midiSrc.Output()
 		if err != nil {
 			mon <- MonitorError(midiSrc.Name(), err)
+			continue
 		}
 
 		if int(midiMsg.Channel()) < len(ctrls) {
