@@ -32,8 +32,8 @@ type SampleChannel chan Quantity
 
 // Message codes
 const (
-	Quit = iota
-	Error = iota
+	Quit        = iota
+	Error       = iota
 	ParamChange = iota
 )
 

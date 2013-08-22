@@ -1,7 +1,7 @@
 package core
 
 type monMsg struct {
-	code int16
+	code        int16
 	paramerName string
 }
 

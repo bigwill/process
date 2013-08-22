@@ -11,7 +11,7 @@ func (m *ctrlMsg) Code() int16 {
 type paramCtrlMsg struct {
 	ctrlMsg
 	index ParamIdx
-	pos Quantity
+	pos   Quantity
 }
 
 func (m *paramCtrlMsg) Index() ParamIdx {

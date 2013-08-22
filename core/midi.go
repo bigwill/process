@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	NoteOff = 128
-	NoteOn = 144
-	Aftertouch = 160
-	ControlChange = 176
-	ProgramChange = 192
-	ChannelPressure = 208
+	NoteOff          = 128
+	NoteOn           = 144
+	Aftertouch       = 160
+	ControlChange    = 176
+	ProgramChange    = 192
+	ChannelPressure  = 208
 	PitchWheelChange = 224
 )
 
@@ -25,12 +25,12 @@ type MidiMessage interface {
 }
 
 type state struct {
-	event byte
+	event   byte
 	channel byte
-	key byte
-	value byte
+	key     byte
+	value   byte
 	program byte
-	pitch uint16
+	pitch   uint16
 }
 
 func (s state) Event() byte {
