@@ -9,7 +9,7 @@ import (
 const bufferSize = 500
 
 type State struct {
-	i int
+	i   int
 	buf []core.Quantity
 }
 
@@ -33,7 +33,7 @@ func (s *State) Input(v core.Quantity) error {
 	s.buf[s.i] = v
 	s.i++
 
-	if (s.i == bufferSize) {
+	if s.i == bufferSize {
 		err := binary.Write(os.Stdout, binary.LittleEndian, s.buf)
 		if err != nil {
 			return err

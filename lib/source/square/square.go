@@ -9,15 +9,15 @@ import (
 type State struct {
 	sampleRate core.Quantity
 	f_g        core.Param
-	t          int64 // wave period in terms of samples @ the given sample rate
-	i          int64 // current index in wave period
+	t          int64          // wave period in terms of samples @ the given sample rate
+	i          int64          // current index in wave period
 	f_a1       core.Processor // 2 anti-aliasing filters for 24dB rolloff around 20 kHZ
 	f_a2       core.Processor
 }
 
 func NewSource(sampleRate core.Quantity) core.Source {
 	s := &State{sampleRate: sampleRate,
-		f_g: linear.NewState("Freq", "Hz", 30, 10000, .5),
+		f_g:  linear.NewState("Freq", "Hz", 30, 10000, .5),
 		f_a1: filter.NewProcessor(sampleRate),
 		f_a2: filter.NewProcessor(sampleRate)}
 	s.f_g.SetHandler(func(p core.Param) {
@@ -25,7 +25,7 @@ func NewSource(sampleRate core.Quantity) core.Source {
 	})
 	s.f_g.SetPos(.5)
 
-	s.f_a1.Param(1).SetPos(1) // cutoff ~= 20kHz
+	s.f_a1.Param(1).SetPos(1)   // cutoff ~= 20kHz
 	s.f_a1.Param(2).SetPos(.04) // Q ~= .72
 	s.f_a2.Param(1).SetPos(1)
 	s.f_a2.Param(2).SetPos(.04)

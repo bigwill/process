@@ -9,8 +9,8 @@ import (
 const (
 	LPF12 = iota
 	HPF12 = iota
-	BPF6 = iota
-	NF2P = iota
+	BPF6  = iota
+	NF2P  = iota
 	NumFilterTypes
 )
 
@@ -26,24 +26,24 @@ type State struct {
 	q          core.Quantity
 
 	// sample state
-	x_n1       core.Quantity
-	x_n2       core.Quantity
-	y_n1       core.Quantity
-	y_n2       core.Quantity
+	x_n1 core.Quantity
+	x_n2 core.Quantity
+	y_n1 core.Quantity
+	y_n2 core.Quantity
 
 	// filter coefficients
-	b0Norm     core.Quantity
-	b1Norm     core.Quantity
-	b2Norm     core.Quantity
-	a1Norm     core.Quantity
-	a2Norm     core.Quantity
+	b0Norm core.Quantity
+	b1Norm core.Quantity
+	b2Norm core.Quantity
+	a1Norm core.Quantity
+	a2Norm core.Quantity
 }
 
 func NewProcessor(sampleRate core.Quantity) core.Processor {
 	s := &State{sampleRate: sampleRate,
 		f_type: linear.NewState("Mode", "", 0, NumFilterTypes-.01, 0.0),
-		f_c: linear.NewState("Cutoff", "Hz", 30.0, 20000.0, .1),
-		f_Q: linear.NewState("Q", "", .1, 18, .2)}
+		f_c:    linear.NewState("Cutoff", "Hz", 30.0, 20000.0, .1),
+		f_Q:    linear.NewState("Q", "", .1, 18, .2)}
 
 	s.f_type.SetHandler(func(p core.Param) {
 		s.setType(p.Val())
@@ -86,7 +86,7 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 
 func (s *State) Process(x_n core.Quantity) (core.Quantity, error) {
 	// Processing
-	y_n := x_n * s.b0Norm + s.x_n1 * s.b1Norm + s.x_n2 * s.b2Norm - s.y_n1 * s.a1Norm - s.y_n2 * s.a2Norm
+	y_n := x_n*s.b0Norm + s.x_n1*s.b1Norm + s.x_n2*s.b2Norm - s.y_n1*s.a1Norm - s.y_n2*s.a2Norm
 	// Update state for next sample
 	s.y_n2 = s.y_n1
 	s.y_n1 = y_n
@@ -95,7 +95,6 @@ func (s *State) Process(x_n core.Quantity) (core.Quantity, error) {
 
 	return y_n, nil
 }
-
 
 func (s *State) setType(t core.Quantity) {
 	s.filterType = int(t)

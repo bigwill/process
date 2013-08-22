@@ -2,17 +2,17 @@ package linear
 
 import (
 	"fmt"
-        "github.com/bigwill/process/core"
+	"github.com/bigwill/process/core"
 )
 
 type State struct {
-	name string
-	units string
+	name    string
+	units   string
 	handler func(core.Param)
-	curPos core.Quantity
-	minVal core.Quantity
-	maxVal core.Quantity
-	curVal core.Quantity
+	curPos  core.Quantity
+	minVal  core.Quantity
+	maxVal  core.Quantity
+	curVal  core.Quantity
 }
 
 func NewState(name string, units string, minVal core.Quantity, maxVal core.Quantity, curPos core.Quantity) *State {

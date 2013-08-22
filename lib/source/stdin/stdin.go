@@ -9,7 +9,7 @@ import (
 const bufferSize = 500
 
 type State struct {
-	i int
+	i   int
 	buf []core.Quantity
 }
 

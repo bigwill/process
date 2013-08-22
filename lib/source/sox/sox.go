@@ -11,8 +11,8 @@ import (
 const bufferSize = 500
 
 type State struct {
-	i int
-	buf []core.Quantity
+	i      int
+	buf    []core.Quantity
 	reader io.Reader
 }
 

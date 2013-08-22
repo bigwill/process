@@ -11,8 +11,8 @@ import (
 const bufferSize = 500
 
 type State struct {
-	i int
-	buf []core.Quantity
+	i      int
+	buf    []core.Quantity
 	writer io.Writer
 }
 
@@ -54,7 +54,7 @@ func (s *State) Input(v core.Quantity) error {
 	s.buf[s.i] = v
 	s.i++
 
-	if (s.i == bufferSize) {
+	if s.i == bufferSize {
 		err := binary.Write(s.writer, binary.LittleEndian, s.buf)
 		if err != nil {
 			return err
