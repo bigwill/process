@@ -1,7 +1,7 @@
 package main
 
 import (
-  "github.com/bigwill/process/core"
+	"github.com/bigwill/process/core"
 	"github.com/bigwill/process/lib/processor/filter"
 	"github.com/bigwill/process/lib/processor/gain"
 	"github.com/bigwill/process/lib/sink/play"
