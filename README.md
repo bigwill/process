@@ -18,3 +18,4 @@ Needs a lot of work to be more interesting
 - support multiple sources and sinks
 - introduce opportunity to report errors during source/sink/processor initialization
 - midisource -> controlsource (introduce a cv-like control model?)
+- additional parameter types: logarithmic, exponential
