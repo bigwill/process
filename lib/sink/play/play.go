@@ -12,13 +12,13 @@ import (
 const bufferSize = 500
 
 type state struct {
-	ctx    core.ProcessorContext
+	ctx    core.Context
 	i      int
 	buf    []core.Quantity
 	writer io.Writer
 }
 
-func NewSink(ctx core.ProcessorContext) core.Sink {
+func NewSink(ctx core.Context) core.Sink {
 	s := &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 
 	// TODO: yuck. make this cleaner

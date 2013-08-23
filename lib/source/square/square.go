@@ -7,7 +7,7 @@ import (
 )
 
 type state struct {
-	ctx  core.ProcessorContext
+	ctx  core.Context
 	f_g  core.Param
 	t    int64          // wave period in terms of samples @ the given sample rate
 	i    int64          // current index in wave period
@@ -15,7 +15,7 @@ type state struct {
 	f_a2 core.Processor
 }
 
-func NewSource(ctx core.ProcessorContext) core.Source {
+func NewSource(ctx core.Context) core.Source {
 	s := &state{ctx: ctx,
 		f_g:  linear.NewState("Freq", "Hz", 30, 10000, .5),
 		f_a1: filter.NewProcessor(ctx),

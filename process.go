@@ -14,7 +14,7 @@ const numChannels = 2
 const framePoolSize = 1000
 
 func main() {
-	ctx := core.NewProcessorContext(sampleRate, numChannels, framePoolSize)
+	ctx := core.NewContext(sampleRate, numChannels, framePoolSize)
 
 	// Source
 	src := square.NewSource(ctx)

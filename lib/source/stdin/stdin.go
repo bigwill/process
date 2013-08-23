@@ -9,12 +9,12 @@ import (
 const bufferSize = 500
 
 type state struct {
-	ctx core.ProcessorContext
+	ctx core.Context
 	i   int
 	buf []core.Quantity
 }
 
-func NewSource(ctx core.ProcessorContext) core.Source {
+func NewSource(ctx core.Context) core.Source {
 	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 type processorState struct {
-	ctx core.ProcessorContext
+	ctx core.Context
 	f_c core.Param
 	k   core.Quantity
 	l   core.Quantity
@@ -21,7 +21,7 @@ type channelState struct {
 	i_n1   core.Quantity
 }
 
-func NewProcessor(ctx core.ProcessorContext) core.Processor {
+func NewProcessor(ctx core.Context) core.Processor {
 	// TODO: l value is zero by default for now
 	s := &processorState{ctx: ctx,
 		f_c: linear.NewState("Cutoff", "Hz", 100.0, 10000.0, .5)}

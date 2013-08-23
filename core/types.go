@@ -10,7 +10,7 @@ type Message interface {
 
 type ControlMessage Message
 
-type ProcessorContext interface {
+type Context interface {
 	SampleRate() Quantity
 	NumChannels() Index
 	FramePool() SampleFramePool

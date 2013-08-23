@@ -6,7 +6,7 @@ type context struct {
 	framePool   SampleFramePool
 }
 
-func NewProcessorContext(sampleRate Quantity, numChannels Index, framePoolSize Index) ProcessorContext {
+func NewContext(sampleRate Quantity, numChannels Index, framePoolSize Index) Context {
 	return &context{sampleRate: sampleRate,
 		numChannels: numChannels,
 		framePool:   NewFramePool(framePoolSize, numChannels)}

@@ -9,7 +9,6 @@ Needs a lot of work to be more interesting
 # To-dos
 
 - introduce utils for common source, sink, processor patterns
-- rename ProcessorContext to something better
 - maybe base implementations for sources, sinks, processors?
 - do some profiling
 - frame pool size computation

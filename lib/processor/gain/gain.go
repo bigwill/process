@@ -9,7 +9,7 @@ type State struct {
 	g core.Param
 }
 
-func NewProcessor(ctx core.ProcessorContext) core.Processor {
+func NewProcessor(ctx core.Context) core.Processor {
 	return &State{g: linear.NewState("Gain", "dB", 0, 1, .8)}
 }
 
