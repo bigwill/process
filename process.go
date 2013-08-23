@@ -10,24 +10,27 @@ import (
 )
 
 const bufferSize = 500
+const numChannels = 2
 const sampleRate = 48000.0
 
 func main() {
+	ctx := core.NewProcessorContext(sampleRate, numChannels, 1000)
+
 	// Source
-	src := square.NewSource(sampleRate)
+	src := square.NewSource(ctx)
 	src.Param(0).SetPos(.1)
 
 	// Processors
-	filterP := filter.NewProcessor(sampleRate)
+	filterP := filter.NewProcessor(ctx)
 	filterP.Param(1).SetPos(.1)
 	filterP.Param(0).SetPos(.9)
 	filterP.Param(2).SetPos(.9)
 
-	gainP := gain.NewProcessor(sampleRate)
+	gainP := gain.NewProcessor(ctx)
 	gainP.Param(0).SetPos(.5)
 
 	// Sink
-	snk := play.NewSink(sampleRate)
+	snk := play.NewSink(ctx)
 
 	// MidiSource
 	var midiSrc core.MidiSource = nil

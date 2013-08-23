@@ -8,37 +8,43 @@ import (
 
 const bufferSize = 500
 
-type State struct {
+type state struct {
+	ctx core.ProcessorContext
 	i   int
 	buf []core.Quantity
 }
 
-func NewSource(sampleRate core.Quantity) core.Source {
-	return &State{buf: make([]core.Quantity, bufferSize, bufferSize)}
+func NewSource(ctx core.ProcessorContext) core.Source {
+	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 }
 
-func (s *State) Name() string {
+func (s *state) Name() string {
 	return "Std In"
 }
 
-func (s *State) NumParams() core.ParamIdx {
+func (s *state) NumParams() core.ParamIdx {
 	return 0
 }
 
-func (s *State) Param(idx core.ParamIdx) core.Param {
+func (s *state) Param(idx core.ParamIdx) core.Param {
 	return nil
 }
 
-func (s *State) Output() (core.Quantity, error) {
+func (s *state) Output() (core.SampleFrame, error) {
 	if s.i == len(s.buf) {
 		err := binary.Read(os.Stdin, binary.LittleEndian, s.buf)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 
 		s.i = 0
 	}
 
-	defer func() { s.i++ }()
-	return s.buf[s.i], nil
+	fr := s.ctx.FramePool().DequeueFrame()
+	for j := core.Index(0); j < s.ctx.NumChannels(); j++ {
+		fr.SetChannelVal(j, s.buf[s.i])
+		s.i++
+	}
+
+	return fr, nil
 }

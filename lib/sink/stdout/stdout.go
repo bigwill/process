@@ -8,32 +8,37 @@ import (
 
 const bufferSize = 500
 
-type State struct {
+type state struct {
+	ctx core.ProcessorContext
 	i   int
 	buf []core.Quantity
 }
 
-func NewSink(sampleRate core.Quantity) core.Sink {
-	return &State{buf: make([]core.Quantity, bufferSize, bufferSize)}
+func NewSink(ctx core.ProcessorContext) core.Sink {
+	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 }
 
-func (s *State) Name() string {
+func (s *state) Name() string {
 	return "Std Out"
 }
 
-func (s *State) NumParams() core.ParamIdx {
+func (s *state) NumParams() core.ParamIdx {
 	return 0
 }
 
-func (s *State) Param(idx core.ParamIdx) core.Param {
+func (s *state) Param(idx core.ParamIdx) core.Param {
 	return nil
 }
 
-func (s *State) Input(v core.Quantity) error {
-	s.buf[s.i] = v
-	s.i++
+func (s *state) Input(fr core.SampleFrame) error {
+	for j := core.Index(0); j < fr.NumChannels(); j++ {
+		s.buf[s.i] = fr.ChannelVal(j)
+		s.i++
+	}
 
-	if s.i == bufferSize {
+	s.ctx.FramePool().EnqueueFrame(fr)
+
+	if s.i == len(s.buf) {
 		err := binary.Write(os.Stdout, binary.LittleEndian, s.buf)
 		if err != nil {
 			return err

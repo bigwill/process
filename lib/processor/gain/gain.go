@@ -9,7 +9,7 @@ type State struct {
 	g core.Param
 }
 
-func NewProcessor(sample_rate core.Quantity) core.Processor {
+func NewProcessor(ctx core.ProcessorContext) core.Processor {
 	return &State{g: linear.NewState("Gain", "dB", 0, 1, .8)}
 }
 
@@ -29,6 +29,10 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Process(v_i_n core.Quantity) (core.Quantity, error) {
-	return s.g.Val() * v_i_n, nil
+func (s *State) Process(x core.SampleFrame) (core.SampleFrame, error) {
+	for i := core.Index(0); i < x.NumChannels(); i++ {
+		x.SetChannelVal(i, s.g.Val()*x.ChannelVal(i))
+	}
+
+	return x, nil
 }

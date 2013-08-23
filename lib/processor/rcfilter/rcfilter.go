@@ -6,20 +6,31 @@ import (
 	"math"
 )
 
-type State struct {
-	sampleRate core.Quantity
-	f_c        core.Param
-	v_o_n1     core.Quantity
-	v_i_n1     core.Quantity
-	i_n1       core.Quantity
-	k          core.Quantity
-	l          core.Quantity
+type processorState struct {
+	ctx core.ProcessorContext
+	f_c core.Param
+	k   core.Quantity
+	l   core.Quantity
+
+	channels []*channelState
 }
 
-func NewProcessor(sampleRate core.Quantity) core.Processor {
+type channelState struct {
+	v_o_n1 core.Quantity
+	v_i_n1 core.Quantity
+	i_n1   core.Quantity
+}
+
+func NewProcessor(ctx core.ProcessorContext) core.Processor {
 	// TODO: l value is zero by default for now
-	s := &State{sampleRate: sampleRate,
+	s := &processorState{ctx: ctx,
 		f_c: linear.NewState("Cutoff", "Hz", 100.0, 10000.0, .5)}
+
+	s.channels = make([]*channelState, ctx.NumChannels())
+	for i := core.Index(0); i < ctx.NumChannels(); i++ {
+		s.channels[i] = &channelState{}
+	}
+
 	s.f_c.SetHandler(func(p core.Param) {
 		s.setCutoff(p.Val())
 	})
@@ -27,36 +38,43 @@ func NewProcessor(sampleRate core.Quantity) core.Processor {
 	return s
 }
 
-func (s *State) Name() string {
+func (ps *processorState) Name() string {
 	return "RC Fil"
 }
 
-func (s *State) NumParams() core.ParamIdx {
+func (ps *processorState) NumParams() core.ParamIdx {
 	return 1
 }
 
-func (s *State) Param(idx core.ParamIdx) core.Param {
+func (ps *processorState) Param(idx core.ParamIdx) core.Param {
 	if idx == 0 {
-		return s.f_c
+		return ps.f_c
 	} else {
 		return nil
 	}
 }
 
-func (s *State) Process(v_i_n core.Quantity) (core.Quantity, error) {
-	// Processing
-	i_n := s.v_i_n1 - s.v_o_n1
-	v_o_n := s.v_o_n1 + s.k*i_n + s.l*(i_n-s.i_n1)
-
-	// Update state for next sample
-	s.v_i_n1 = v_i_n
-	s.v_o_n1 = v_o_n
-	s.i_n1 = i_n
-
-	return v_o_n, nil
+func (ps *processorState) Process(fr core.SampleFrame) (core.SampleFrame, error) {
+	for i := core.Index(0); i < fr.NumChannels(); i++ {
+		fr.SetChannelVal(i, ps.channels[i].process(ps, fr.ChannelVal(i)))
+	}
+	return fr, nil
 }
 
-func (s *State) setCutoff(f_c core.Quantity) {
+func (cs *channelState) process(ps *processorState, v_i_n core.Quantity) core.Quantity {
+	// Processing
+	i_n := cs.v_i_n1 - cs.v_o_n1
+	v_o_n := cs.v_o_n1 + ps.k*i_n + ps.l*(i_n-cs.i_n1)
+
+	// Update processorState for next sample
+	cs.v_i_n1 = v_i_n
+	cs.v_o_n1 = v_o_n
+	cs.i_n1 = i_n
+
+	return v_o_n
+}
+
+func (ps *processorState) setCutoff(f_c core.Quantity) {
 	var RC core.Quantity = 1 / (2.0 * math.Pi * f_c)
-	s.k = 1 / (s.sampleRate * RC)
+	ps.k = 1 / (ps.ctx.SampleRate() * RC)
 }
