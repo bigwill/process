@@ -9,12 +9,12 @@ import (
 	"log"
 )
 
-const bufferSize = 500
-const numChannels = 2
 const sampleRate = 48000.0
+const numChannels = 2
+const framePoolSize = 1000
 
 func main() {
-	ctx := core.NewProcessorContext(sampleRate, numChannels, 1000)
+	ctx := core.NewProcessorContext(sampleRate, numChannels, framePoolSize)
 
 	// Source
 	src := square.NewSource(ctx)
