@@ -6,7 +6,7 @@ import (
 	"github.com/bigwill/process/lib/processor/filter"
 )
 
-type sourceState struct {
+type state struct {
 	ctx  core.ProcessorContext
 	f_g  core.Param
 	t    int64          // wave period in terms of samples @ the given sample rate
@@ -16,7 +16,7 @@ type sourceState struct {
 }
 
 func NewSource(ctx core.ProcessorContext) core.Source {
-	s := &sourceState{ctx: ctx,
+	s := &state{ctx: ctx,
 		f_g:  linear.NewState("Freq", "Hz", 30, 10000, .5),
 		f_a1: filter.NewProcessor(ctx),
 		f_a2: filter.NewProcessor(ctx)}
@@ -33,15 +33,15 @@ func NewSource(ctx core.ProcessorContext) core.Source {
 	return s
 }
 
-func (s *sourceState) Name() string {
+func (s *state) Name() string {
 	return "Sq Osc"
 }
 
-func (s *sourceState) NumParams() core.ParamIdx {
+func (s *state) NumParams() core.ParamIdx {
 	return 1
 }
 
-func (s *sourceState) Param(idx core.ParamIdx) core.Param {
+func (s *state) Param(idx core.ParamIdx) core.Param {
 	if idx == 0 {
 		return s.f_g
 	} else {
@@ -49,8 +49,8 @@ func (s *sourceState) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *sourceState) squareOutput() core.Quantity {
-	defer func(q *sourceState) {
+func (s *state) squareOutput() core.Quantity {
+	defer func(q *state) {
 		q.i = (q.i + 1) % q.t
 	}(s)
 	if s.i <= s.t/2 {
@@ -60,7 +60,7 @@ func (s *sourceState) squareOutput() core.Quantity {
 	}
 }
 
-func (s *sourceState) Output() (core.SampleFrame, error) {
+func (s *state) Output() (core.SampleFrame, error) {
 	fr := s.ctx.FramePool().DequeueFrame()
 
 	v := s.squareOutput()
@@ -81,6 +81,6 @@ func (s *sourceState) Output() (core.SampleFrame, error) {
 	return fr, nil
 }
 
-func (s *sourceState) setFrequency(f_g core.Quantity) {
+func (s *state) setFrequency(f_g core.Quantity) {
 	s.t = int64(s.ctx.SampleRate() / f_g)
 }
