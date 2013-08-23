@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/bigwill/process/core"
 	"io"
-	"log"
 	"os/exec"
 )
 
@@ -18,7 +17,7 @@ type state struct {
 	reader io.Reader
 }
 
-func NewSource(ctx core.Context) core.Source {
+func NewSource(ctx core.Context) (core.Source, error) {
 	s := &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 
 	// TODO: yuck. generalize this at some point
@@ -26,18 +25,16 @@ func NewSource(ctx core.Context) core.Source {
 
 	var err error
 	s.reader, err = cmd.StdoutPipe()
-	if err != nil { // TODO: better error reporting
-		log.Printf("cmd fail = %v", err)
-		return nil
+	if err != nil {
+		return nil, err
 	}
 
 	err = cmd.Start()
-	if err != nil { // TODO: better error reporting
-		log.Printf("cmd fail = %v", err)
-		return nil
+	if err != nil {
+		return nil, err
 	}
 
-	return s
+	return s, nil
 }
 
 func (s *state) Name() string {

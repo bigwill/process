@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/bigwill/process/core"
 	"io"
-	"log"
 	"os/exec"
 )
 
@@ -18,7 +17,7 @@ type state struct {
 	writer io.Writer
 }
 
-func NewSink(ctx core.Context) core.Sink {
+func NewSink(ctx core.Context) (core.Sink, error) {
 	s := &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 
 	// TODO: yuck. make this cleaner
@@ -26,18 +25,16 @@ func NewSink(ctx core.Context) core.Sink {
 
 	var err error
 	s.writer, err = cmd.StdinPipe()
-	if err != nil { // TODO: better error reporting
-		log.Printf("cmd fail = %v", err)
-		return nil
+	if err != nil {
+		return nil, err
 	}
 
 	err = cmd.Start()
-	if err != nil { // TODO: better error reporting
-		log.Printf("cmd fail = %v", err)
-		return nil
+	if err != nil {
+		return nil, err
 	}
 
-	return s
+	return s, nil
 }
 
 func (s *state) Name() string {

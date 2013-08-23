@@ -15,11 +15,24 @@ type state struct {
 	f_a2 core.Processor
 }
 
-func NewSource(ctx core.Context) core.Source {
+func NewSource(ctx core.Context) (core.Source, error) {
+	var err error
+	var f_a1, f_a2 core.Processor
+
+	f_a1, err = filter.NewProcessor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	f_a2, err = filter.NewProcessor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	s := &state{ctx: ctx,
 		f_g:  linear.NewState("Freq", "Hz", 30, 10000, .5),
-		f_a1: filter.NewProcessor(ctx),
-		f_a2: filter.NewProcessor(ctx)}
+		f_a1: f_a1,
+		f_a2: f_a2}
 	s.f_g.SetHandler(func(p core.Param) {
 		s.setFrequency(p.Val())
 	})
@@ -30,7 +43,7 @@ func NewSource(ctx core.Context) core.Source {
 	s.f_a2.Param(1).SetPos(1)
 	s.f_a2.Param(2).SetPos(.04)
 
-	return s
+	return s, nil
 }
 
 func (s *state) Name() string {

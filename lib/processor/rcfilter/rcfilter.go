@@ -21,7 +21,7 @@ type channelState struct {
 	i_n1   core.Quantity
 }
 
-func NewProcessor(ctx core.Context) core.Processor {
+func NewProcessor(ctx core.Context) (core.Processor, error) {
 	// TODO: l value is zero by default for now
 	s := &processorState{ctx: ctx,
 		f_c: linear.NewState("Cutoff", "Hz", 100.0, 10000.0, .5)}
@@ -35,7 +35,7 @@ func NewProcessor(ctx core.Context) core.Processor {
 		s.setCutoff(p.Val())
 	})
 	s.f_c.SetPos(.5)
-	return s
+	return s, nil
 }
 
 func (ps *processorState) Name() string {

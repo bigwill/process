@@ -9,8 +9,8 @@ type State struct {
 	g core.Param
 }
 
-func NewProcessor(ctx core.Context) core.Processor {
-	return &State{g: linear.NewState("Gain", "dB", 0, 1, .8)}
+func NewProcessor(ctx core.Context) (core.Processor, error) {
+	return &State{g: linear.NewState("Gain", "dB", 0, 1, .8)}, nil
 }
 
 func (s *State) Name() string {

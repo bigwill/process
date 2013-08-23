@@ -14,8 +14,8 @@ type state struct {
 	buf []core.Quantity
 }
 
-func NewSource(ctx core.Context) core.Source {
-	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
+func NewSource(ctx core.Context) (core.Source, error) {
+	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}, nil
 }
 
 func (s *state) Name() string {

@@ -14,23 +14,43 @@ const numChannels = 2
 const framePoolSize = 1000
 
 func main() {
+	var err error
+	var src core.Source
+	var filterP, gainP core.Processor
+	var snk core.Sink
+
 	ctx := core.NewContext(sampleRate, numChannels, framePoolSize)
 
 	// Source
-	src := square.NewSource(ctx)
+	src, err = square.NewSource(ctx)
+	if err != nil {
+		log.Printf("err = %v", err)
+	}
+
 	src.Param(0).SetPos(.1)
 
 	// Processors
-	filterP := filter.NewProcessor(ctx)
+	filterP, err = filter.NewProcessor(ctx)
+	if err != nil {
+		log.Printf("err = %v", err)
+	}
+
 	filterP.Param(1).SetPos(.1)
 	filterP.Param(0).SetPos(.9)
 	filterP.Param(2).SetPos(.9)
 
-	gainP := gain.NewProcessor(ctx)
+	gainP, err = gain.NewProcessor(ctx)
+	if err != nil {
+		log.Printf("err = %v", err)
+	}
+
 	gainP.Param(0).SetPos(.5)
 
 	// Sink
-	snk := play.NewSink(ctx)
+	snk, err = play.NewSink(ctx)
+	if err != nil {
+		log.Printf("err = %v", err)
+	}
 
 	// MidiSource
 	var midiSrc core.MidiSource = nil

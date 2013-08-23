@@ -14,8 +14,8 @@ type state struct {
 	buf []core.Quantity
 }
 
-func NewSink(ctx core.Context) core.Sink {
-	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
+func NewSink(ctx core.Context) (core.Sink, error) {
+	return &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}, nil
 }
 
 func (s *state) Name() string {
