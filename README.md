@@ -17,3 +17,5 @@ Needs a lot of work to be more interesting
 - more processors!
 - revisit cgo at some point
 - support multiple sources and sinks
+- introduce opportunity to report errors during source/sink/processor initialization
+- midisource -> controlsource (introduce a cv-like control model?)
