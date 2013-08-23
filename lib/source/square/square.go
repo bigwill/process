@@ -6,20 +6,20 @@ import (
 	"github.com/bigwill/process/lib/processor/filter"
 )
 
-type State struct {
-	sampleRate core.Quantity
-	f_g        core.Param
-	t          int64          // wave period in terms of samples @ the given sample rate
-	i          int64          // current index in wave period
-	f_a1       core.Processor // 2 anti-aliasing filters for 24dB rolloff around 20 kHZ
-	f_a2       core.Processor
+type sourceState struct {
+	ctx  core.ProcessorContext
+	f_g  core.Param
+	t    int64          // wave period in terms of samples @ the given sample rate
+	i    int64          // current index in wave period
+	f_a1 core.Processor // 2 anti-aliasing filters for 24dB rolloff around 20 kHZ
+	f_a2 core.Processor
 }
 
-func NewSource(sampleRate core.Quantity) core.Source {
-	s := &State{sampleRate: sampleRate,
+func NewSource(ctx core.ProcessorContext) core.Source {
+	s := &sourceState{ctx: ctx,
 		f_g:  linear.NewState("Freq", "Hz", 30, 10000, .5),
-		f_a1: filter.NewProcessor(sampleRate),
-		f_a2: filter.NewProcessor(sampleRate)}
+		f_a1: filter.NewProcessor(ctx),
+		f_a2: filter.NewProcessor(ctx)}
 	s.f_g.SetHandler(func(p core.Param) {
 		s.setFrequency(p.Val())
 	})
@@ -33,15 +33,15 @@ func NewSource(sampleRate core.Quantity) core.Source {
 	return s
 }
 
-func (s *State) Name() string {
+func (s *sourceState) Name() string {
 	return "Sq Osc"
 }
 
-func (s *State) NumParams() core.ParamIdx {
+func (s *sourceState) NumParams() core.ParamIdx {
 	return 1
 }
 
-func (s *State) Param(idx core.ParamIdx) core.Param {
+func (s *sourceState) Param(idx core.ParamIdx) core.Param {
 	if idx == 0 {
 		return s.f_g
 	} else {
@@ -49,8 +49,8 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) squareOutput() core.Quantity {
-	defer func(q *State) {
+func (s *sourceState) squareOutput() core.Quantity {
+	defer func(q *sourceState) {
 		q.i = (q.i + 1) % q.t
 	}(s)
 	if s.i <= s.t/2 {
@@ -60,14 +60,27 @@ func (s *State) squareOutput() core.Quantity {
 	}
 }
 
-func (s *State) Output() (core.Quantity, error) {
-	y, err := s.f_a1.Process(s.squareOutput())
-	if err != nil {
-		return 0, err
+func (s *sourceState) Output() (core.SampleFrame, error) {
+	fr := s.ctx.FramePool().DequeueFrame()
+
+	v := s.squareOutput()
+	for i := core.Index(0); i < s.ctx.NumChannels(); i++ {
+		fr.SetChannelVal(i, v)
 	}
-	return s.f_a2.Process(y)
+
+	fr, err := s.f_a1.Process(fr)
+	if err != nil {
+		return nil, err
+	}
+
+	fr, err = s.f_a2.Process(fr)
+	if err != nil {
+		return nil, err
+	}
+
+	return fr, nil
 }
 
-func (s *State) setFrequency(f_g core.Quantity) {
-	s.t = int64(s.sampleRate / f_g)
+func (s *sourceState) setFrequency(f_g core.Quantity) {
+	s.t = int64(s.ctx.SampleRate() / f_g)
 }

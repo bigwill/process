@@ -14,22 +14,18 @@ const (
 	NumFilterTypes
 )
 
-type State struct {
-	sampleRate core.Quantity
-	f_type     core.Param
-	f_c        core.Param
-	f_Q        core.Param
+type processorState struct {
+	ctx    core.ProcessorContext
+	f_type core.Param // type (low pass, hi pass, etc.)
+	f_c    core.Param // cutoff frequency
+	f_Q    core.Param
+
+	channels []*channelState
 
 	// Parameter Values
 	filterType int
 	cutoff     core.Quantity
 	q          core.Quantity
-
-	// sample state
-	x_n1 core.Quantity
-	x_n2 core.Quantity
-	y_n1 core.Quantity
-	y_n2 core.Quantity
 
 	// filter coefficients
 	b0Norm core.Quantity
@@ -39,11 +35,23 @@ type State struct {
 	a2Norm core.Quantity
 }
 
-func NewProcessor(sampleRate core.Quantity) core.Processor {
-	s := &State{sampleRate: sampleRate,
+type channelState struct {
+	x_n1 core.Quantity
+	x_n2 core.Quantity
+	y_n1 core.Quantity
+	y_n2 core.Quantity
+}
+
+func NewProcessor(ctx core.ProcessorContext) core.Processor {
+	s := &processorState{ctx: ctx,
 		f_type: linear.NewState("Mode", "", 0, NumFilterTypes-.01, 0.0),
 		f_c:    linear.NewState("Cutoff", "Hz", 30.0, 20000.0, .1),
 		f_Q:    linear.NewState("Q", "", .1, 18, .2)}
+
+	s.channels = make([]*channelState, ctx.NumChannels())
+	for i := core.Index(0); i < ctx.NumChannels(); i++ {
+		s.channels[i] = &channelState{}
+	}
 
 	s.f_type.SetHandler(func(p core.Param) {
 		s.setType(p.Val())
@@ -63,15 +71,15 @@ func NewProcessor(sampleRate core.Quantity) core.Processor {
 	return s
 }
 
-func (s *State) Name() string {
+func (s *processorState) Name() string {
 	return "Filter"
 }
 
-func (s *State) NumParams() core.ParamIdx {
+func (s *processorState) NumParams() core.ParamIdx {
 	return 3
 }
 
-func (s *State) Param(idx core.ParamIdx) core.Param {
+func (s *processorState) Param(idx core.ParamIdx) core.Param {
 	switch idx {
 	case 0:
 		return s.f_type
@@ -84,35 +92,44 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Process(x_n core.Quantity) (core.Quantity, error) {
-	// Processing
-	y_n := x_n*s.b0Norm + s.x_n1*s.b1Norm + s.x_n2*s.b2Norm - s.y_n1*s.a1Norm - s.y_n2*s.a2Norm
-	// Update state for next sample
-	s.y_n2 = s.y_n1
-	s.y_n1 = y_n
-	s.x_n2 = s.x_n1
-	s.x_n1 = x_n
+func (s *processorState) Process(x_n core.SampleFrame) (core.SampleFrame, error) {
+	for i := core.Index(0); i < x_n.NumChannels(); i++ {
+		x_n.SetChannelVal(i, s.channels[i].process(s, x_n.ChannelVal(i)))
+	}
 
-	return y_n, nil
+	return x_n, nil
 }
 
-func (s *State) setType(t core.Quantity) {
+func (cs *channelState) process(ps *processorState, x_n core.Quantity) core.Quantity {
+	// Processing
+	y_n := x_n*ps.b0Norm + cs.x_n1*ps.b1Norm + cs.x_n2*ps.b2Norm - cs.y_n1*ps.a1Norm - cs.y_n2*ps.a2Norm
+
+	// Update state for next sample
+	cs.y_n2 = cs.y_n1
+	cs.y_n1 = y_n
+	cs.x_n2 = cs.x_n1
+	cs.x_n1 = x_n
+
+	return y_n
+}
+
+func (s *processorState) setType(t core.Quantity) {
 	s.filterType = int(t)
 	s.computeCoefficients()
 }
 
-func (s *State) setCutoff(cutoff core.Quantity) {
+func (s *processorState) setCutoff(cutoff core.Quantity) {
 	s.cutoff = cutoff
 	s.computeCoefficients()
 }
 
-func (s *State) setQ(Q core.Quantity) {
+func (s *processorState) setQ(Q core.Quantity) {
 	s.q = Q
 	s.computeCoefficients()
 }
 
-func (s *State) computeCoefficients() {
-	w0 := float64(2.0 * math.Pi * s.cutoff / s.sampleRate)
+func (s *processorState) computeCoefficients() {
+	w0 := float64(2.0 * math.Pi * s.cutoff / s.ctx.SampleRate())
 	alph := core.Quantity(math.Sin(w0)) / 2.0 / s.q
 
 	var b0, b1, b2, a0, a1, a2 core.Quantity

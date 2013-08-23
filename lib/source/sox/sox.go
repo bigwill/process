@@ -2,6 +2,7 @@ package sox
 
 import (
 	"encoding/binary"
+	"fmt"
 	"github.com/bigwill/process/core"
 	"io"
 	"log"
@@ -10,17 +11,18 @@ import (
 
 const bufferSize = 500
 
-type State struct {
+type state struct {
+	ctx    core.ProcessorContext
 	i      int
 	buf    []core.Quantity
 	reader io.Reader
 }
 
-func NewSource(sampleRate core.Quantity) core.Source {
-	s := &State{buf: make([]core.Quantity, bufferSize, bufferSize)}
+func NewSource(ctx core.ProcessorContext) core.Source {
+	s := &state{ctx: ctx, buf: make([]core.Quantity, bufferSize*ctx.NumChannels())}
 
 	// TODO: yuck. generalize this at some point
-	cmd := exec.Command("sox", "~/go/process/src/github.com/bigwill/process/res/Crumar_Cello.wav", "-t", "f64", "-r", "48k", "-c", "1", "-")
+	cmd := exec.Command("sox", "~/go/process/src/github.com/bigwill/process/res/Crumar_Cello.wav", "-t", "f64", "-r", fmt.Sprintf("%v", ctx.SampleRate()), "-c", fmt.Sprintf("%v", ctx.NumChannels()), "-")
 
 	var err error
 	s.reader, err = cmd.StdoutPipe()
@@ -38,28 +40,34 @@ func NewSource(sampleRate core.Quantity) core.Source {
 	return s
 }
 
-func (s *State) Name() string {
+func (s *state) Name() string {
 	return "Sox"
 }
 
-func (s *State) NumParams() core.ParamIdx {
+func (s *state) NumParams() core.ParamIdx {
 	return 0
 }
 
-func (s *State) Param(idx core.ParamIdx) core.Param {
+func (s *state) Param(idx core.ParamIdx) core.Param {
 	return nil
 }
 
-func (s *State) Output() (core.Quantity, error) {
+func (s *state) Output() (core.SampleFrame, error) {
 	if s.i == len(s.buf) {
 		err := binary.Read(s.reader, binary.LittleEndian, s.buf)
 		if err != nil {
-			return 0, err
+			return nil, err
 		}
 
 		s.i = 0
 	}
 
-	defer func() { s.i++ }()
-	return s.buf[s.i], nil
+	fr := s.ctx.FramePool().DequeueFrame()
+
+	for j := core.Index(0); j < s.ctx.NumChannels(); j++ {
+		fr.SetChannelVal(j, s.buf[s.i])
+		s.i++
+	}
+
+	return fr, nil
 }

@@ -10,6 +10,12 @@ type Message interface {
 
 type ControlMessage Message
 
+type ProcessorContext interface {
+	SampleRate() Quantity
+	NumChannels() Index
+	FramePool() SampleFramePool
+}
+
 type MonitorMessage interface {
 	Message
 	ParamerName() string
@@ -28,7 +34,19 @@ type ErrorMonitorMessage interface {
 
 type ControlChannel chan ControlMessage
 type MonitorChannel chan MonitorMessage
-type SampleChannel chan Quantity
+type SampleChannel chan SampleFrame
+
+type SampleFrame interface {
+	// NOT channel in golang parlance, but in audio signal parlance (e.g., stereo has 2 audio channels)
+	NumChannels() Index
+	ChannelVal(Index) Quantity
+	SetChannelVal(Index, Quantity)
+}
+
+type SampleFramePool interface {
+	DequeueFrame() SampleFrame
+	EnqueueFrame(SampleFrame)
+}
 
 // Message codes
 const (
@@ -57,17 +75,17 @@ type Paramer interface {
 
 type Source interface {
 	Paramer
-	Output() (Quantity, error)
+	Output() (SampleFrame, error)
 }
 
 type Processor interface {
 	Paramer
-	Process(Quantity) (Quantity, error)
+	Process(SampleFrame) (SampleFrame, error)
 }
 
 type Sink interface {
 	Paramer
-	Input(Quantity) error
+	Input(SampleFrame) error
 }
 
 type MidiSource interface {
