@@ -6,7 +6,7 @@ Requires sox and play commands available in the sox project (http://sox.sourcefo
 
 Needs a lot of work to be more interesting
 
-* To-dos
+# To-dos
 
 - introduce utils for common source, sink, processor patterns
 - rename ProcessorContext to something better
