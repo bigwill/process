@@ -38,6 +38,8 @@ func NewSource(ctx core.Context) (core.Source, error) {
 	})
 	s.f_g.SetPos(.5)
 
+	// TODO: set cutoff as a function of the sample rate. Some preliminary work is
+	// TODO: required to make parameters settable by value, not just control position
 	s.f_a1.Param(1).SetPos(1)   // cutoff ~= 20kHz
 	s.f_a1.Param(2).SetPos(.04) // Q ~= .72
 	s.f_a2.Param(1).SetPos(1)
