@@ -44,6 +44,8 @@ type SampleFrame interface {
 }
 
 type SampleFramePool interface {
+	Size() Index
+	NumAvailable() Index
 	DequeueFrame() SampleFrame
 	EnqueueFrame(SampleFrame)
 }

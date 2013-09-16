@@ -33,6 +33,14 @@ func NewFramePool(poolSize Index, numChannels Index) SampleFramePool {
 	return &framePool{frameChannel: frameChannel}
 }
 
+func (fp *framePool) Size() Index {
+	return Index(cap(fp.frameChannel))
+}
+
+func (fp *framePool) NumAvailable() Index {
+	return Index(len(fp.frameChannel))
+}
+
 func (fp *framePool) DequeueFrame() SampleFrame {
 	return <-fp.frameChannel
 }
