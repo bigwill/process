@@ -55,8 +55,6 @@ func (s *state) Input(v core.SampleFrame) error {
 		s.i++
 	}
 
-	s.ctx.FramePool().EnqueueFrame(v)
-
 	if s.i == len(s.buf) {
 		err := binary.Write(s.writer, binary.LittleEndian, s.buf)
 		if err != nil {

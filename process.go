@@ -59,7 +59,7 @@ func main() {
 	log.Printf("filter cutoff = %v", filterP.Param(1).Val())
 	log.Printf("filter Q = %v", filterP.Param(2).Val())
 
-	_, monChan := core.RunChain(src, []core.Processor{filterP, gainP}, snk, midiSrc)
+	_, monChan := core.RunChain(ctx, src, []core.Processor{filterP, gainP}, snk, midiSrc)
 
 	for {
 		m := <-monChan

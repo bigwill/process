@@ -29,10 +29,10 @@ func (s *State) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *State) Process(x core.SampleFrame) (core.SampleFrame, error) {
+func (s *State) Process(x core.SampleFrame) error {
 	for i := core.Index(0); i < x.NumChannels(); i++ {
 		x.SetChannelVal(i, s.g.Val()*x.ChannelVal(i))
 	}
 
-	return x, nil
+	return nil
 }

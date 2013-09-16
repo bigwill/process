@@ -54,11 +54,11 @@ func (ps *processorState) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (ps *processorState) Process(fr core.SampleFrame) (core.SampleFrame, error) {
+func (ps *processorState) Process(fr core.SampleFrame) error {
 	for i := core.Index(0); i < fr.NumChannels(); i++ {
 		fr.SetChannelVal(i, ps.channels[i].process(ps, fr.ChannelVal(i)))
 	}
-	return fr, nil
+	return nil
 }
 
 func (cs *channelState) process(ps *processorState, v_i_n core.Quantity) core.Quantity {

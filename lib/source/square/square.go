@@ -75,25 +75,23 @@ func (s *state) squareOutput() core.Quantity {
 	}
 }
 
-func (s *state) Output() (core.SampleFrame, error) {
-	fr := s.ctx.FramePool().DequeueFrame()
-
+func (s *state) Output(fr core.SampleFrame) error {
 	v := s.squareOutput()
 	for i := core.Index(0); i < s.ctx.NumChannels(); i++ {
 		fr.SetChannelVal(i, v)
 	}
 
-	fr, err := s.f_a1.Process(fr)
+	err := s.f_a1.Process(fr)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	fr, err = s.f_a2.Process(fr)
+	err = s.f_a2.Process(fr)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return fr, nil
+	return nil
 }
 
 func (s *state) setFrequency(f_g core.Quantity) {

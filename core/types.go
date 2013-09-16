@@ -75,12 +75,12 @@ type Paramer interface {
 
 type Source interface {
 	Paramer
-	Output() (SampleFrame, error)
+	Output(SampleFrame) error // callers pass by reference, expect frame to be modified in place
 }
 
 type Processor interface {
 	Paramer
-	Process(SampleFrame) (SampleFrame, error)
+	Process(SampleFrame) error // callers pass by reference, expect frame to be modified in place
 }
 
 type Sink interface {

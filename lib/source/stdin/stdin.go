@@ -30,21 +30,20 @@ func (s *state) Param(idx core.ParamIdx) core.Param {
 	return nil
 }
 
-func (s *state) Output() (core.SampleFrame, error) {
+func (s *state) Output(fr core.SampleFrame) error {
 	if s.i == len(s.buf) {
 		err := binary.Read(os.Stdin, binary.LittleEndian, s.buf)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		s.i = 0
 	}
 
-	fr := s.ctx.FramePool().DequeueFrame()
 	for j := core.Index(0); j < s.ctx.NumChannels(); j++ {
 		fr.SetChannelVal(j, s.buf[s.i])
 		s.i++
 	}
 
-	return fr, nil
+	return nil
 }

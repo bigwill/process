@@ -92,12 +92,12 @@ func (s *processorState) Param(idx core.ParamIdx) core.Param {
 	}
 }
 
-func (s *processorState) Process(x_n core.SampleFrame) (core.SampleFrame, error) {
+func (s *processorState) Process(x_n core.SampleFrame) error {
 	for i := core.Index(0); i < x_n.NumChannels(); i++ {
 		x_n.SetChannelVal(i, s.channels[i].process(s, x_n.ChannelVal(i)))
 	}
 
-	return x_n, nil
+	return nil
 }
 
 func (cs *channelState) process(ps *processorState, x_n core.Quantity) core.Quantity {
