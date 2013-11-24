@@ -1,7 +1,7 @@
 package core
 
 type Quantity float64
-type Index int64
+type Integer int64
 type ParamIdx int16
 
 type Message interface {
@@ -12,7 +12,7 @@ type ControlMessage Message
 
 type Context interface {
 	SampleRate() Quantity
-	NumChannels() Index
+	NumChannels() Integer
 	FramePool() SampleFramePool
 }
 
@@ -38,14 +38,14 @@ type SampleChannel chan SampleFrame
 
 type SampleFrame interface {
 	// NOT channel in golang parlance, but in audio signal parlance (e.g., stereo has 2 audio channels)
-	NumChannels() Index
-	ChannelVal(Index) Quantity
-	SetChannelVal(Index, Quantity)
+	NumChannels() Integer
+	ChannelVal(Integer) Quantity
+	SetChannelVal(Integer, Quantity)
 }
 
 type SampleFramePool interface {
-	Size() Index
-	NumAvailable() Index
+	Size() Integer
+	NumAvailable() Integer
 	DequeueFrame() SampleFrame
 	EnqueueFrame(SampleFrame)
 }

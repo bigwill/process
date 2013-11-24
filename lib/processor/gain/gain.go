@@ -30,7 +30,7 @@ func (s *state) Param(idx core.ParamIdx) core.Param {
 }
 
 func (s *state) Process(x core.SampleFrame) error {
-	for i := core.Index(0); i < x.NumChannels(); i++ {
+	for i := core.Integer(0); i < x.NumChannels(); i++ {
 		x.SetChannelVal(i, s.g.Val()*x.ChannelVal(i))
 	}
 

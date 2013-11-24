@@ -42,7 +42,7 @@ func (s *srcState) Output(fr SampleFrame) error {
 		v = -1
 	}
 
-	for j := Index(0); j < fr.NumChannels(); j++ {
+	for j := Integer(0); j < fr.NumChannels(); j++ {
 		fr.SetChannelVal(j, v)
 		fr.SetChannelVal(j, -1*v)
 	}
@@ -128,7 +128,7 @@ func TestRunChainNoMidi(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		f1 := <- src.spyChannel()
 		f2 := <- snk.spyChannel()
-		for j := Index(0); j < ctx.NumChannels(); j++ {
+		for j := Integer(0); j < ctx.NumChannels(); j++ {
 			if f1.ChannelVal(j) == f2.ChannelVal(j) {
 				t.Logf("%v'th channel of %v'th frame matched (src=%v, snk=%v)", j, i, f1.ChannelVal(j), f2.ChannelVal(j))
 			} else {

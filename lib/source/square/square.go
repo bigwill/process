@@ -77,7 +77,7 @@ func (s *state) squareOutput() core.Quantity {
 
 func (s *state) Output(fr core.SampleFrame) error {
 	v := s.squareOutput()
-	for i := core.Index(0); i < s.ctx.NumChannels(); i++ {
+	for i := core.Integer(0); i < s.ctx.NumChannels(); i++ {
 		fr.SetChannelVal(i, v)
 	}
 

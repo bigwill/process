@@ -50,7 +50,7 @@ func (s *state) Param(idx core.ParamIdx) core.Param {
 }
 
 func (s *state) Input(v core.SampleFrame) error {
-	for j := core.Index(0); j < v.NumChannels(); j++ {
+	for j := core.Integer(0); j < v.NumChannels(); j++ {
 		s.buf[s.i] = v.ChannelVal(j)
 		s.i++
 	}

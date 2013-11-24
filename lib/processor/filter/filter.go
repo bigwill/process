@@ -49,7 +49,7 @@ func NewProcessor(ctx core.Context) (core.Processor, error) {
 		f_Q:    linear.NewState("Q", "", .1, 18, .2)}
 
 	s.channels = make([]*channelState, ctx.NumChannels())
-	for i := core.Index(0); i < ctx.NumChannels(); i++ {
+	for i := core.Integer(0); i < ctx.NumChannels(); i++ {
 		s.channels[i] = &channelState{}
 	}
 
@@ -93,7 +93,7 @@ func (s *processorState) Param(idx core.ParamIdx) core.Param {
 }
 
 func (s *processorState) Process(x_n core.SampleFrame) error {
-	for i := core.Index(0); i < x_n.NumChannels(); i++ {
+	for i := core.Integer(0); i < x_n.NumChannels(); i++ {
 		x_n.SetChannelVal(i, s.channels[i].process(s, x_n.ChannelVal(i)))
 	}
 
