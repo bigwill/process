@@ -16,5 +16,7 @@ Needs a lot of work to be more interesting
 - more processors!
 - revisit cgo at some point
 - support multiple sources and sinks
-- midisource -> controlsource (introduce a cv-like control model?)
+- midisource -> controlsource 
+  - introduce a cv-like control model?
+  - piggyback cv on sample frames
 - additional parameter types: logarithmic, exponential
