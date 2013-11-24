@@ -75,11 +75,11 @@ func (s *processorState) Name() string {
 	return "Filter"
 }
 
-func (s *processorState) NumParams() core.ParamIdx {
+func (s *processorState) NumParams() core.Integer {
 	return 3
 }
 
-func (s *processorState) Param(idx core.ParamIdx) core.Param {
+func (s *processorState) Param(idx core.Integer) core.Param {
 	switch idx {
 	case 0:
 		return s.f_type

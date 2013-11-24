@@ -41,11 +41,11 @@ func (s *state) Name() string {
 	return "Sox Play"
 }
 
-func (s *state) NumParams() core.ParamIdx {
+func (s *state) NumParams() core.Integer {
 	return 0
 }
 
-func (s *state) Param(idx core.ParamIdx) core.Param {
+func (s *state) Param(idx core.Integer) core.Param {
 	return nil
 }
 

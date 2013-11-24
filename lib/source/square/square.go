@@ -52,11 +52,11 @@ func (s *state) Name() string {
 	return "Sq Osc"
 }
 
-func (s *state) NumParams() core.ParamIdx {
+func (s *state) NumParams() core.Integer {
 	return 1
 }
 
-func (s *state) Param(idx core.ParamIdx) core.Param {
+func (s *state) Param(idx core.Integer) core.Param {
 	if idx == 0 {
 		return s.f_g
 	} else {

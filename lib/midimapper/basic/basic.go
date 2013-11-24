@@ -12,6 +12,6 @@ func NewMidiMapper() core.MidiMapper {
 }
 
 func (s *State) Map(midiMsg core.MidiMessage) core.ParamControlMessage {
-	return core.NewParamControlMessage(core.ParamIdx(midiMsg.Key()),
+	return core.NewParamControlMessage(core.Integer(midiMsg.Key()),
 		core.Quantity(midiMsg.Value())/127.0)
 }

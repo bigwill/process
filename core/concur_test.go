@@ -26,11 +26,11 @@ func (s *srcState) Name() string {
 	return "Test Source"
 }
 
-func (s *srcState) NumParams() ParamIdx {
+func (s *srcState) NumParams() Integer {
 	return 0
 }
 
-func (s *srcState) Param(idx ParamIdx) Param {
+func (s *srcState) Param(idx Integer) Param {
 	return nil
 }
 
@@ -71,11 +71,11 @@ func (s *procState) Name() string {
 	return "Test Proc"
 }
 
-func (s *procState) NumParams() ParamIdx {
+func (s *procState) NumParams() Integer {
 	return 0
 }
 
-func (s *procState) Param(idx ParamIdx) Param {
+func (s *procState) Param(idx Integer) Param {
 	return nil
 }
 
@@ -100,11 +100,11 @@ func (s *snkState) Name() string {
 	return "Test Sink"
 }
 
-func (s *snkState) NumParams() ParamIdx {
+func (s *snkState) NumParams() Integer {
 	return 0
 }
 
-func (s *snkState) Param(idx ParamIdx) Param {
+func (s *snkState) Param(idx Integer) Param {
 	return nil
 }
 

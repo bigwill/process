@@ -10,11 +10,11 @@ func (m *ctrlMsg) Code() int16 {
 
 type paramCtrlMsg struct {
 	ctrlMsg
-	index ParamIdx
+	index Integer
 	pos   Quantity
 }
 
-func (m *paramCtrlMsg) Index() ParamIdx {
+func (m *paramCtrlMsg) Index() Integer {
 	return m.index
 }
 
@@ -26,6 +26,6 @@ func NewQuitControlMessage() ControlMessage {
 	return &ctrlMsg{Quit}
 }
 
-func NewParamControlMessage(index ParamIdx, pos Quantity) ParamControlMessage {
+func NewParamControlMessage(index Integer, pos Quantity) ParamControlMessage {
 	return &paramCtrlMsg{ctrlMsg{ParamChange}, index, pos}
 }

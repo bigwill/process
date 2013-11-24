@@ -2,7 +2,6 @@ package core
 
 type Quantity float64
 type Integer int64
-type ParamIdx int16
 
 type Message interface {
 	Code() int16
@@ -23,7 +22,7 @@ type MonitorMessage interface {
 
 type ParamControlMessage interface {
 	ControlMessage
-	Index() ParamIdx
+	Index() Integer
 	Pos() Quantity
 }
 
@@ -71,8 +70,8 @@ type Param interface {
 
 type Paramer interface {
 	Name() string
-	NumParams() ParamIdx
-	Param(ParamIdx) Param
+	NumParams() Integer
+	Param(Integer) Param
 }
 
 type Source interface {
